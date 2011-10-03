@@ -8,6 +8,29 @@ has 'host'         => ( is => 'ro', isa => 'Str', default => 'localhost' );
 has 'port'         => ( is => 'ro', isa => 'Int', default => 6379 );
 has '_sock'        => ( is => 'ro', isa => 'IO::Socket', init_arg => undef, lazy_build => 1 );
 
+BEGIN { 
+    my %COMMANDS = 
+      ( ECHO        => 1,
+        SET         => 2,
+      );
+
+    foreach my $cmd ( keys %COMMANDS ) { 
+        my $meth = sub { 
+            my $self = shift;
+            my @args = @_;
+
+            if ( my $args_num = $COMMANDS{$cmd} ) { 
+                croak sprintf( 'Redis %s command requires %s arguments', $cmd, $args_num )
+                  unless @args == $args_num;
+            }
+
+            return $self->_send_command( $cmd, @args );
+        };
+
+        __PACKAGE__->meta->add_method( lc $cmd, $meth );
+    }
+};
+
 my $CRLF = "\x0D\x0A";
 
 sub _build__sock { 
@@ -20,31 +43,6 @@ sub _build__sock {
     ) or die sprintf q{Can't connect to Redis host at %s:%s: %s}, $self->host, $self->port, $@;
 
     return $sock;
-}
-
-
-# ECHO command
-sub echo { 
-    my $self = shift;
-    my $arg  = shift;
-
-    croak 'No string provided for Redis ECHO command'
-      unless defined $arg;
-
-    my $res = $self->_send_command( 'ECHO', $arg );
-
-    return $res;
-}
-
-# SET command
-sub set { 
-    my $self = shift;
-    my @args = @_;
-
-    croak 'Redis SET requires a key and a value'
-      unless @_ == 2;
-
-    my $res = $self->_send_command( 'SET', @args );
 }
 
 sub _send_command { 
@@ -113,6 +111,19 @@ sub _read_bulk_reply {
 
     return $buf;
 }
+
+sub _read_single_line { 
+    my $self = shift;
+    my $sock = $self->_sock;
+
+    local $/ = $CRLF;
+
+    my $val = readline $sock;
+    chomp $val;
+
+    return $val;
+}
+
 
 1;
 

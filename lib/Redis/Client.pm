@@ -4,6 +4,8 @@ use Moose;
 use IO::Socket::INET;
 use Carp 'croak';
 
+use Redis::Client::String;
+
 has 'host'         => ( is => 'ro', isa => 'Str', default => 'localhost' );
 has 'port'         => ( is => 'ro', isa => 'Int', default => 6379 );
 has '_sock'        => ( is => 'ro', isa => 'IO::Socket', init_arg => undef, lazy_build => 1 );
@@ -13,6 +15,7 @@ BEGIN {
       ( ECHO        => 1,
         SET         => 2,
         DEL         => undef,
+        GET         => 1,
       );
 
     foreach my $cmd ( keys %COMMANDS ) { 
@@ -104,6 +107,9 @@ sub _read_bulk_reply {
 
     my $length = readline $sock;
     chomp $length;
+
+    return if $length == -1;    # null response
+
     my $buf;
     $sock->read( $buf, $length );
 
@@ -124,6 +130,17 @@ sub _read_single_line {
 
     return $val;
 }
+
+
+around 'get' => sub { 
+    my ( $orig, $self, $key ) = @_;
+
+    my $result = $self->$orig( $key );
+    return unless $result;
+    
+    my $obj = Redis::Client::String->new( key => $key, value => $result, client => $self );
+    return $obj;
+};
 
 
 1;

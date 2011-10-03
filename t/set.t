@@ -5,14 +5,20 @@ use warnings;
 
 use Test::More tests => 4;
 
-use_ok 'Redis::Client';
+SKIP: { 
+    unless( $ENV{PERL_REDIS_TEST_SERVER} ) {  
+        skip 'No Redis server available', 4
+    }
 
-my $redis = Redis::Client->new;
+    use_ok 'RedisClientTest';
 
-ok $redis;
-isa_ok $redis, 'Redis::Client';
+    my $redis = RedisClientTest->server;
 
-my $result = $redis->set( perl_redis_client_test => 'foobar' );
+    ok $redis;
+    isa_ok $redis, 'Redis::Client';
 
-is $result, 'OK';
+    my $result = $redis->set( perl_redis_client_test => 'foobar' );
+    
+    is $result, 'OK';
+}
 

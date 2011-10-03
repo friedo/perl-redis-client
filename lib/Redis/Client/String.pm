@@ -1,90 +1,71 @@
 package Redis::Client::String;
 
+use strict;
+use warnings;
+
 use overload 
-  '""'     => '_get_scalar',
-  '${}'    => '_get_scalar',
+  '""'     => 'FETCH',
+  '${}'    => 'FETCH',
   '<=>'    => '_num_compare',
   'cmp'    => '_str_compare';
 
-
-use Moose;
-use Scalar::Util 'blessed', 'refaddr', 'reftype';
-
-has 'key'      => ( is => 'ro', isa => 'Str', required => 1 );
-has 'value'    => ( is => 'rw', isa => 'Str', required => 1 );
-has 'client'   => ( is => 'ro', isa => 'Redis::Client', required => 1 );
+use Scalar::Util 'blessed', 'refaddr';
+use Carp 'croak';
 
 my %OBJ_MAP;
-sub _get_scalar { 
-    my $self = shift;
-
-    tie my $scalar, blessed $self, $self->value;
-    $OBJ_MAP{ refaddr \$scalar } = $self;
-
-    warn "returning [$scalar]";
-
-    return $scalar;
-}
-
-sub _num_compare { 
-    my $self = shift;
-    my $compare = shift;
-
-    return $self->value <=> $compare;
-}
-
-sub _str_compare { 
-    my $self = shift;
-    my $compare = shift;
-
-    return $self->value cmp $compare;
-}
-
-around [ '_num_compare', '_str_compare' ] => sub {
-    my ( $orig, $self, @args ) = @_;
-
-    warn "type of self = " . reftype $self;
-
-    if ( reftype $self eq reftype \"" ) { 
-        my $real_self = $OBJ_MAP{ refaddr $self };
-        return $real_self->$orig( @args );
-    }
-
-    return $self->$orig( @args );
-};
 
 sub TIESCALAR { 
-    my ( $class, $scalar ) = @_;
+    my ( $class, $key, $client ) = @_;
 
-    warn "tieing [$scalar] to [$class]";
+    my $val = $client->get( $key );
 
-    return bless \$scalar, $class;
+    my $obj = { key => $key, client => $client };
+
+    my $ref = \$val;
+
+    $OBJ_MAP{ refaddr $ref } = $obj;
+
+    return bless $ref, $class;
 }
 
 sub FETCH { 
     my $self = shift;
-    
-    warn "fetch self = [$self]";
+    my $obj = $self->_get_obj;
 
-    my $obj = $OBJ_MAP{ refaddr $self };
-
-    return $obj->value;
+    return $obj->{client}->get( $obj->{key} );
 }
 
 sub STORE { 
     my $self = shift;
     my $val  = shift;
+    my $obj = $self->_get_obj;
+
+    return $obj->{client}->set( $obj->{key}, $val );
+}
+
+sub _num_compare { 
+    my $self = shift;
+    my $val = shift;
+
+    return $self->FETCH <=> $val;
+}
+
+sub _str_compare { 
+    my $self = shift;
+    my $val = shift;
+
+    return $self->FETCH cmp $val;
+}
+
+sub _get_obj { 
+    my $self = shift;
 
     my $obj = $OBJ_MAP{ refaddr $self };
 
-    warn "store obj = [$obj]";
+    die "Can't find object info for $self"
+      unless $obj;
 
-    my $ret = $obj->client->set( $obj->key => $val );
-    $obj->value( $val );
-
-    warn "store return = [$ret]";
-
-    return $ret;
+    return $obj;
 }
 
 1;

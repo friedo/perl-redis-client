@@ -5,37 +5,37 @@ use warnings;
 
 use lib 't';
 
-#use Test::More tests => 8;
+use Test::More tests => 8;
 use RedisClientTest;
-#use_ok 'RedisClientTest';
+use_ok 'RedisClientTest';
 
 SKIP: { 
     my $redis = RedisClientTest->server;
 
-#    skip 7, 'No Redis server available' unless $redis;
+    skip 'No Redis server available', 7 unless $redis;
     
-#    ok $redis;
-#    isa_ok $redis, 'Redis::Client';
+    ok $redis;
+    isa_ok $redis, 'Redis::Client';
     
     my $result = $redis->set( perl_redis_test_var => "foobar" );
     
-#    is $result, 'OK';
-    warn "running get";
+    is $result, 'OK';
+
     my $got = $redis->get( 'perl_redis_test_var' );
-    warn "got = [$got]";
-#    is $got, 'foobar';
+
+    is $got, 'foobar';
 
     $got = 'narf';
-#    is $got, 'narf';
+    is $got, 'narf';
 
     # test round-trip
     my $got2 = $redis->get( 'perl_redis_test_var' );
-#    is $got2, 'narf';
+    is $got2, 'narf';
 
     print $got2;
 
     my $res = $redis->del( 'perl_redis_test_var' );
-#    is $res, 1;
+    is $res, 1;
 }
 
 

@@ -12,7 +12,7 @@ use_ok 'RedisClientTest';
 SKIP: { 
     my $redis = RedisClientTest->server;
 
-    skip 4, 'No Redis server available' unless $redis;
+    skip 'No Redis server available', 4 unless $redis;
     
     ok $redis;
     isa_ok $redis, 'Redis::Client';

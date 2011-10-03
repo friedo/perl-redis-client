@@ -12,6 +12,7 @@ BEGIN {
     my %COMMANDS = 
       ( ECHO        => 1,
         SET         => 2,
+        DEL         => undef,
       );
 
     foreach my $cmd ( keys %COMMANDS ) { 
@@ -81,7 +82,7 @@ sub _get_response {
     # the first byte tells us what to expect
     my %msg_types = ( '+'   => '_read_single_line',
                       '-'   => '_read_single_line',
-                      ':'   => '_read_integer',
+                      ':'   => '_read_single_line',
                       '$'   => '_read_bulk_reply',
                       '*'   => '_read_multi_bulk_reply' );
 

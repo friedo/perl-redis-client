@@ -3,16 +3,27 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use lib 't';
 
-use_ok 'Redis::Client';
+use Test::More tests => 5;
 
-my $redis = Redis::Client->new;
+use_ok 'RedisClientTest';
 
-ok $redis;
-isa_ok $redis, 'Redis::Client';
+SKIP: { 
+    my $redis = RedisClientTest->server;
 
-my $result = $redis->echo( 'foobar' );
+    skip 4, 'No Redis server available' unless $redis;
+    
+    ok $redis;
+    isa_ok $redis, 'Redis::Client';
+    
+    my $result = $redis->echo( 'foobar' );
+    
+    is $result, 'foobar';
 
-is $result, 'foobar';
+    eval { $redis->echo( 'too', 'many', 'args' ) };
+
+    like $@, qr/requires 1 argument/;
+}
+
 

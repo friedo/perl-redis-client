@@ -3,17 +3,17 @@
 use strict;
 use warnings;
 
+use lib 't';
+
 use Test::More tests => 4;
 
+use_ok 'RedisClientTest';
+
 SKIP: { 
-    unless( $ENV{PERL_REDIS_TEST_SERVER} ) {  
-        skip 'No Redis server available', 4
-    }
-
-    use_ok 'RedisClientTest';
-
     my $redis = RedisClientTest->server;
-
+    
+    skip 'No Redis server available', 3 unless $redis;
+    
     ok $redis;
     isa_ok $redis, 'Redis::Client';
 

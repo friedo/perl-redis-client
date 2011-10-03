@@ -32,6 +32,19 @@ sub echo {
       unless defined $arg;
 
     my $res = $self->_send_command( 'ECHO', $arg );
+
+    return $res;
+}
+
+# SET command
+sub set { 
+    my $self = shift;
+    my @args = @_;
+
+    croak 'Redis SET requires a key and a value'
+      unless @_ == 2;
+
+    my $res = $self->_send_command( 'SET', @args );
 }
 
 sub _send_command { 
@@ -39,11 +52,28 @@ sub _send_command {
     my ( $cmd, @args ) = @_;
 
     my $sock = $self->_sock;
-    my $cmdline = sprintf '%s %s%s', $cmd, ( join ' ' => @args ), $CRLF;
+    my $cmd_block = $self->_build_urp( $cmd, @args );
 
-    $sock->send( $cmdline );
+    $sock->send( $cmd_block );
 
     return $self->_get_response;
+}
+
+# build a command string using the binary-safe Unified Request Protocol
+sub _build_urp { 
+    my $self = shift;
+    my @items = @_;
+
+    my $length = @_;
+
+    my $block = sprintf '*%s%s', $length, $CRLF;
+
+    foreach my $line( @items ) { 
+        $block .= sprintf '$%s%s', length $line, $CRLF;
+        $block .= $line . $CRLF;
+    }
+
+    return $block;
 }
 
 sub _get_response { 

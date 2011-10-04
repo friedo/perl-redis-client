@@ -15,6 +15,9 @@ BEGIN {
       ( ECHO        => 1,
         SET         => 2,
         DEL         => undef,
+        LPUSH       => undef,
+        RPUSH       => undef,
+        LINDEX      => 1,
         GET         => 1,
       );
 
@@ -36,6 +39,29 @@ BEGIN {
 };
 
 my $CRLF = "\x0D\x0A";
+
+around 'get' => sub { 
+    my ( $orig, $self, $key ) = @_;
+
+    my $result = $self->$orig( $key );
+    return unless $result;
+    
+    my $obj = Redis::Client::String->new( key => $key, value => $result, client => $self );
+    return $obj;
+};
+
+foreach my $func( 'lpush', 'rpush' ) { 
+    around $func => sub { 
+        my ( $orig, $self, @args ) = @_;
+
+        my $rcmd = uc $func;
+        croak 'Redis $rcmd requires 2 or more arguments'
+          unless @args >= 2;
+
+        $self->$orig( @args );
+    };
+}
+
 
 sub _build__sock { 
     my $self = shift;
@@ -130,17 +156,6 @@ sub _read_single_line {
 
     return $val;
 }
-
-
-around 'get' => sub { 
-    my ( $orig, $self, $key ) = @_;
-
-    my $result = $self->$orig( $key );
-    return unless $result;
-    
-    my $obj = Redis::Client::String->new( key => $key, value => $result, client => $self );
-    return $obj;
-};
 
 
 1;

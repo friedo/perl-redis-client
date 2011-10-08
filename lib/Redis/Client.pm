@@ -41,13 +41,17 @@ BEGIN {
 my $CRLF = "\x0D\x0A";
 
 around 'get' => sub { 
-    my ( $orig, $self, $key ) = @_;
+    my ( $orig, $self, $key, %args ) = @_;
 
     my $result = $self->$orig( $key );
     return unless $result;
     
-    my $obj = Redis::Client::String->new( key => $key, value => $result, client => $self );
-    return $obj;
+    if ( $args{tied} ) { 
+        my $obj = Redis::Client::String->new( key => $key, value => $result, client => $self );
+        return $obj;
+    }
+
+    return $result;
 };
 
 foreach my $func( 'lpush', 'rpush' ) { 

@@ -1,13 +1,13 @@
 ---
-abstract: unknown
-author:
-  - unknown
+abstract: ~
+author: []
 build_requires:
   ExtUtils::MakeMaker: 6.42
 configure_requires:
   ExtUtils::MakeMaker: 0
+distribution_type: module
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112621'
+generated_by: 'ExtUtils::MakeMaker version 6.57_05'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,4 +20,4 @@ no_index:
 requires:
   Moose: 0
   Tie::IxHash: 0
-version: ''
+version: undef

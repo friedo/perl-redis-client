@@ -6,6 +6,8 @@ use Carp 'croak';
 
 use Redis::Client::String;
 
+use Data::Dumper;
+
 has 'host'         => ( is => 'ro', isa => 'Str', default => 'localhost' );
 has 'port'         => ( is => 'ro', isa => 'Int', default => 6379 );
 has '_sock'        => ( is => 'ro', isa => 'IO::Socket', init_arg => undef, lazy_build => 1 );
@@ -40,19 +42,6 @@ BEGIN {
 
 my $CRLF = "\x0D\x0A";
 
-around 'get' => sub { 
-    my ( $orig, $self, $key, %args ) = @_;
-
-    my $result = $self->$orig( $key );
-    return unless $result;
-    
-    if ( $args{tied} ) { 
-        my $obj = Redis::Client::String->new( key => $key, value => $result, client => $self );
-        return $obj;
-    }
-
-    return $result;
-};
 
 foreach my $func( 'lpush', 'rpush' ) { 
     around $func => sub { 

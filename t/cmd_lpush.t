@@ -19,7 +19,7 @@ SKIP: {
     
     my $res = $redis->lpush( perl_redis_test_list => 42 );
 
-    is $res, 'OK';
+    is $res, 1;
 
     my $res2 = $redis->del( 'perl_redis_test_list' );
 

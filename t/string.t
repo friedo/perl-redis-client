@@ -7,6 +7,8 @@ use lib 't';
 
 use Test::More tests => 9;
 use RedisClientTest;
+use Redis::Client::String;
+
 use_ok 'RedisClientTest';
 
 SKIP: { 
@@ -21,21 +23,17 @@ SKIP: {
     
     is $result, 'OK';
 
-    my $got = $redis->get( 'perl_redis_test_var', tied => 1 );
+    tie my $val, 'Redis::Client::String', key => 'perl_redis_test_var', client => $redis;
+    ok tied $val;
+    isa_ok tied $val, 'Redis::Client::String';
 
-    isa_ok $got, 'Redis::Client::String';
-    is $got, 'foobar';
+    is $val, 'foobar';
 
-    $got = 'narf';
-    is $got, 'narf';
+    $val = 'narf';
 
-    # test round-trip
-    my $got2 = $redis->get( 'perl_redis_test_var' );
-    is $got2, 'narf';
+    is $val, 'narf';
 
-    my $res = $redis->del( 'perl_redis_test_var' );
-    is $res, 1;
-
+    ok $redis->del( 'perl_redis_test_var' );
 }
 
 

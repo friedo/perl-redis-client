@@ -12,35 +12,29 @@ use overload
 use Scalar::Util 'blessed', 'refaddr';
 use Carp 'croak';
 
-my %OBJ_MAP;
-
 sub TIESCALAR { 
-    my ( $class, $key, $client ) = @_;
+    my ( $class, %args ) = @_;
 
-    my $val = $client->get( $key );
+    croak 'No key specified' unless $args{key};
+    croak 'No Redis client object specified' unless $args{client};
 
-    my $obj = { key => $key, client => $client };
+    my $obj = { %args };
 
-    my $ref = \$val;
-
-    $OBJ_MAP{ refaddr $ref } = $obj;
-
-    return bless $ref, $class;
+    return bless $obj, $class;
 }
 
 sub FETCH { 
     my $self = shift;
-    my $obj = $self->_get_obj;
 
-    return $obj->{client}->get( $obj->{key} );
+    my $val = $self->{client}->get( $self->{key} );
+    return $val;
 }
 
 sub STORE { 
     my $self = shift;
     my $val  = shift;
-    my $obj = $self->_get_obj;
 
-    return $obj->{client}->set( $obj->{key}, $val );
+    return $self->{client}->set( $self->{key}, $val );
 }
 
 sub _num_compare { 
@@ -55,17 +49,6 @@ sub _str_compare {
     my $val = shift;
 
     return $self->FETCH cmp $val;
-}
-
-sub _get_obj { 
-    my $self = shift;
-
-    my $obj = $OBJ_MAP{ refaddr $self };
-
-    die "Can't find object info for $self"
-      unless $obj;
-
-    return $obj;
 }
 
 1;

@@ -123,13 +123,33 @@ sub _get_response {
                       '*'   => '_read_multi_bulk_reply' );
 
     my $buf;
-    $sock->recv( $buf, 1 );
+    $sock->read( $buf, 1 );
     die "Can't read from socket" unless $buf;
     die "Can't understand Redis message type [$buf]" unless exists $msg_types{$buf};
 
     my $meth = $msg_types{$buf};
 
     return $self->$meth;
+}
+
+sub _read_multi_bulk_reply { 
+    my $self = shift;
+    my $sock = $self->_sock;
+
+    local $/ = $CRLF;
+
+    my $parts = readline $sock;
+    chomp $parts;
+
+    return if $parts == 0;      # null response
+
+    my @results;
+    foreach my $part ( 1 .. $parts ) { 
+        # better hope we don't see a multi-bulk inside a multi-bulk!
+        push @results, $self->_get_response;
+    }
+
+    return @results;
 }
 
 sub _read_bulk_reply { 

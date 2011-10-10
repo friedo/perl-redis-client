@@ -7,7 +7,7 @@ use lib 't';
 
 use Test::More tests => 31;
 use RedisClientTest;
-use Redis::Client::List;;
+use Redis::Client::List;
 
 use_ok 'RedisClientTest';
 

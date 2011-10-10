@@ -4,10 +4,6 @@ use Moose;
 use IO::Socket::INET;
 use Carp 'croak';
 
-use Redis::Client::String;
-
-use Data::Dumper;
-
 has 'host'         => ( is => 'ro', isa => 'Str', default => 'localhost' );
 has 'port'         => ( is => 'ro', isa => 'Int', default => 6379 );
 has '_sock'        => ( is => 'ro', isa => 'IO::Socket', init_arg => undef, lazy_build => 1 );
@@ -27,7 +23,18 @@ BEGIN {
         RPUSH       => undef,
         RPOP        => 1,
         LPUSH       => undef,
-        LPOP        => 1
+        LPOP        => 1,
+
+        HGET        => 2,
+        HSET        => 3,
+        HDEL        => undef,
+        HEXISTS     => 2,
+        HGETALL     => 1,
+        HKEYS       => 1,
+        HVALS       => 1,
+        HLEN        => 1,
+        HMGET       => undef,
+        HMSET       => undef,
       );
 
     foreach my $cmd ( keys %COMMANDS ) { 

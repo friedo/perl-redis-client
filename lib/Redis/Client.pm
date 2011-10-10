@@ -15,12 +15,19 @@ has '_sock'        => ( is => 'ro', isa => 'IO::Socket', init_arg => undef, lazy
 BEGIN { 
     my %COMMANDS = 
       ( ECHO        => 1,
+
         SET         => 2,
         DEL         => undef,
-        LPUSH       => undef,
-        RPUSH       => undef,
-        LINDEX      => 1,
         GET         => 1,
+
+        LINDEX      => 2,
+        LSET        => 3,
+        LLEN        => 1,
+        LTRIM       => 3,
+        RPUSH       => undef,
+        RPOP        => 1,
+        LPUSH       => undef,
+        LPOP        => 1
       );
 
     foreach my $cmd ( keys %COMMANDS ) { 

@@ -5,16 +5,19 @@ use warnings;
 
 use lib 't';
 
-use Test::More tests => 12;
+use Test::More tests => 35;
+use Data::Dumper;
+
 use RedisClientTest;
 use Redis::Client::Hash;
+
 
 use_ok 'RedisClientTest';
 
 SKIP: { 
     my $redis = RedisClientTest->server;
 
-    skip 'No Redis server available', 11 unless $redis;
+    skip 'No Redis server available', 34 unless $redis;
     
     ok $redis;
     isa_ok $redis, 'Redis::Client';
@@ -35,6 +38,40 @@ SKIP: {
     is $hash{G}, 7;
     is $hash{H}, 8;
 
+    my @keys = sort { $a cmp $b } keys %hash;
+
+    my $i = 0;
+    for ( 'A' .. 'H' ) { 
+        is $keys[$i++], $_;
+    }
+
+    ok exists $hash{A};
+    ok !exists $hash{narf};
+
+    my $dval = delete $hash{C};
+    is $dval, 3;
+    is $hash{C}, undef;
+
+    my @vals = sort { $a <=> $b } values %hash;
+    is $vals[0], 1;
+    is $vals[1], 2;
+    is $vals[2], 4;
+    is $vals[3], 5;
+    is $vals[4], 6;
+    is $vals[5], 7;
+    is $vals[6], 8;
+
+    %hash = ( );
+
+    my @keys2 = keys %hash;
+    ok @keys2 == 0;
+
+    my @vals2 = values %hash;
+    ok @vals2 == 0;
+
+    $hash{foo} = 42;
+    ok exists $hash{foo};
+    is $hash{foo}, 42;
 
     ok $redis->del( 'perl_redis_test_hash' );
 }

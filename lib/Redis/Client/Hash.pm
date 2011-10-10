@@ -4,6 +4,8 @@ use strict;
 use warnings;
 
 use Carp 'croak';
+use Data::Dumper;
+
 
 sub TIEHASH { 
     my ( $class, %args ) = @_;
@@ -32,13 +34,23 @@ sub STORE {
 sub DELETE { 
     my ( $self, $key ) = @_;
 
-    return $self->{client}->hdel( $self->{key}, $key );
+    my $val = $self->FETCH( $key );
+
+    if ( $self->{client}->hdel( $self->{key}, $key ) ) { 
+        return $val;
+    }
+
+    return;
 }
 
 sub CLEAR { 
     my ( $self ) = @_;
 
-    croak 'not yet';
+    my @keys = $self->{client}->hkeys( $self->{key} );
+
+    foreach my $key( @keys ) { 
+        $self->DELETE( $key );
+    }
 }
 
 sub EXISTS { 
@@ -54,16 +66,15 @@ sub FIRSTKEY {
     my @keys = $self->{client}->hkeys( $self->{key} );
     return if @keys == 0;
 
-    $self->{key_index} = 0;
     $self->{keys} = \@keys;
 
-    return $self->{keys}[ $self->{key_index}++ ];
+    return $self->NEXTKEY;
 }
 
 sub NEXTKEY { 
-    my ( $self );
+    my ( $self ) = @_;
 
-    return $self->{keys}[ $self->{key_index}++ ];
+    return shift @{ $self->{keys} };
 }
 
 

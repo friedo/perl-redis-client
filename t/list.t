@@ -5,11 +5,25 @@ use warnings;
 
 use lib 't';
 
-use Test::More tests => 32;
+use Test::More tests => 34;
 use RedisClientTest;
 use Redis::Client::List;
 
 use_ok 'RedisClientTest';
+
+eval { 
+    tie my @list, 'Redis::Client::List';
+};
+
+like $@, qr/^Attribute/;
+undef $@;
+
+eval { 
+    tie my @list, 'Redis::Client::List', key => 'blorb';
+};
+
+like $@, qr/^Attribute.+client/;
+undef $@;
 
 SKIP: { 
     my $redis = RedisClientTest->server;

@@ -1,7 +1,7 @@
 package Redis::Client::String;
 
-use strict;
-use warnings;
+use Moose;
+with 'Redis::Client::Role::Tied';
 
 use overload 
   '""'     => 'FETCH',
@@ -13,20 +13,13 @@ use Scalar::Util 'blessed', 'refaddr';
 use Carp 'croak';
 
 sub TIESCALAR { 
-    my ( $class, %args ) = @_;
-
-    croak 'No key specified' unless $args{key};
-    croak 'No Redis client object specified' unless $args{client};
-
-    my $obj = { %args };
-
-    return bless $obj, $class;
+    return shift->new( @_ );
 }
 
 sub FETCH { 
     my $self = shift;
 
-    my $val = $self->{client}->get( $self->{key} );
+    my $val = $self->client->get( $self->{key} );
     return $val;
 }
 
@@ -34,7 +27,7 @@ sub STORE {
     my $self = shift;
     my $val  = shift;
 
-    return $self->{client}->set( $self->{key}, $val );
+    return $self->client->set( $self->{key}, $val );
 }
 
 sub _num_compare { 
@@ -50,6 +43,8 @@ sub _str_compare {
 
     return $self->FETCH cmp $val;
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 

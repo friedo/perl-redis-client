@@ -5,7 +5,7 @@ use warnings;
 
 use lib 't';
 
-use Test::More tests => 36;
+use Test::More tests => 38;
 use Data::Dumper;
 
 use RedisClientTest;
@@ -13,6 +13,20 @@ use Redis::Client::Hash;
 
 
 use_ok 'RedisClientTest';
+
+eval { 
+    tie my %hash, 'Redis::Client::Hash';
+};
+
+like $@, qr/^Attribute/;
+undef $@;
+
+eval { 
+    tie my %hash, 'Redis::Client::Hash', key => 'blorb';
+};
+
+like $@, qr/^Attribute.+client/;
+undef $@;
 
 SKIP: { 
     my $redis = RedisClientTest->server;

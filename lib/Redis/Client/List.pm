@@ -1,39 +1,32 @@
 package Redis::Client::List;
 
-use strict;
-use warnings;
+use Moose;
+with 'Redis::Client::Role::Tied';
 
 use Carp 'croak';
 
 sub TIEARRAY { 
-    my ( $class, %args ) = @_;
-
-    croak 'No key specified' unless $args{key};
-    croak 'No Redis client object specified' unless $args{client};
-
-    my $obj = { %args };
-
-    return bless $obj, $class;
+    return shift->new( @_ );
 }
 
 
 sub FETCH { 
     my ( $self, $idx ) = @_;
 
-    my $val = $self->{client}->lindex( $self->{key}, $idx );
+    my $val = $self->client->lindex( $self->{key}, $idx );
     return $val;
 }
 
 sub STORE { 
     my ( $self, $idx, $val ) = @_;
 
-    return $self->{client}->lset( $self->{key}, $idx, $val );
+    return $self->client->lset( $self->{key}, $idx, $val );
 }
 
 sub FETCHSIZE { 
     my ( $self ) = @_;
 
-    return $self->{client}->llen( $self->{key} );
+    return $self->client->llen( $self->{key} );
 }
 
 sub STORESIZE { 
@@ -59,35 +52,37 @@ sub DELETE {
 sub CLEAR { 
     my ( $self ) = @_;
 
-    return $self->{client}->ltrim( $self->{key}, 0, 0 );
+    return $self->client->ltrim( $self->{key}, 0, 0 );
 }
 
 sub PUSH { 
     my ( $self, @args ) = @_;
 
-    return $self->{client}->rpush( $self->{key}, @args );
+    return $self->client->rpush( $self->{key}, @args );
 }
 
 sub POP { 
     my ( $self ) = @_;
 
-    return $self->{client}->rpop( $self->{key} );
+    return $self->client->rpop( $self->{key} );
 }
 
 sub UNSHIFT { 
     my ( $self, @args ) = @_;
 
-    return $self->{client}->lpush( $self->{key}, @args );
+    return $self->client->lpush( $self->{key}, @args );
 }
 
 sub SHIFT { 
     my ( $self ) = @_;
 
-    return $self->{client}->lpop( $self->{key} );
+    return $self->client->lpop( $self->{key} );
 }
 
 sub SPLICE { 
     croak q{splice is not implemented for Redis lists.};
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;

@@ -5,7 +5,7 @@ use warnings;
 
 use lib 't';
 
-use Test::More tests => 31;
+use Test::More tests => 32;
 use RedisClientTest;
 use Redis::Client::List;
 
@@ -14,7 +14,7 @@ use_ok 'RedisClientTest';
 SKIP: { 
     my $redis = RedisClientTest->server;
 
-    skip 'No Redis server available', 30 unless $redis;
+    skip 'No Redis server available', 31 unless $redis;
     
     ok $redis;
     isa_ok $redis, 'Redis::Client';
@@ -35,6 +35,8 @@ SKIP: {
     push @list, 'narf';
     ok @list == 6;
     is $list[5], 'narf';
+    is $redis->lindex( 'perl_redis_test_list', 5 ), 'narf';
+
 
     push @list, 'foo', 'bar', 'baz';
     ok @list == 9;

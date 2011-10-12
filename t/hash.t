@@ -5,7 +5,7 @@ use warnings;
 
 use lib 't';
 
-use Test::More tests => 35;
+use Test::More tests => 36;
 use Data::Dumper;
 
 use RedisClientTest;
@@ -17,7 +17,7 @@ use_ok 'RedisClientTest';
 SKIP: { 
     my $redis = RedisClientTest->server;
 
-    skip 'No Redis server available', 34 unless $redis;
+    skip 'No Redis server available', 35 unless $redis;
     
     ok $redis;
     isa_ok $redis, 'Redis::Client';
@@ -37,6 +37,8 @@ SKIP: {
     is $hash{F}, 6;
     is $hash{G}, 7;
     is $hash{H}, 8;
+
+    is $redis->hget( 'perl_redis_test_hash', 'H' ), 8;
 
     my @keys = sort { $a cmp $b } keys %hash;
 

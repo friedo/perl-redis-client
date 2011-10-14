@@ -11,6 +11,7 @@ has '_sock'        => ( is => 'ro', isa => 'IO::Socket', init_arg => undef, lazy
 BEGIN { 
     my %COMMANDS = 
       ( ECHO        => 1,
+        TYPE        => 1,
 
         SET         => 2,
         DEL         => undef,

@@ -1,7 +1,7 @@
 package Redis::Client;
 
 use Moose;
-use IO::Socket::INET;
+use IO::Socket::INET ();
 use Carp 'croak';
 
 has 'host'         => ( is => 'ro', isa => 'Str', default => 'localhost' );
@@ -36,6 +36,11 @@ BEGIN {
         HLEN        => 1,
         HMGET       => undef,
         HMSET       => undef,
+
+        SADD        => undef,
+        SREM        => undef,
+        SMEMBERS    => 1,
+        SISMEMBER   => 2,
       );
 
     foreach my $cmd ( keys %COMMANDS ) { 

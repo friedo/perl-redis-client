@@ -71,5 +71,5 @@ SKIP: {
     $set{blorp} = undef;
     ok exists $set{blorp};
 
-    ok $redis->del( 'perl_redis_test_hash' );
+    ok $redis->del( 'perl_redis_test_set' );
 }

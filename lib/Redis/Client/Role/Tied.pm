@@ -19,4 +19,39 @@ sub BUILD {
     }
 }
 
+
 1;
+
+
+__END__
+
+
+=pod
+
+=encoding utf8
+
+=head1 DESCRIPTION
+
+This role contains common functionality used by the Redis::Client C<tie> classes.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Redis::Client>
+
+=item L<Redis::Client::String>
+
+=item L<Redis::Client::List>
+
+=item L<Redis::Client::Hash>
+
+=item L<Redis::Client::Set>
+
+=item L<Redis::Client::Zset>
+
+=back
+
+=cut
+
+

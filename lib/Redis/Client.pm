@@ -49,7 +49,7 @@ BEGIN {
         ZADD        => undef,
         ZCARD       => 1,
         ZCOUNT      => 3,
-        ZRANGE      => 3,
+        ZRANGE      => undef,
         ZRANK       => 2,
         ZREM        => undef,
         ZSCORE      => 2,
@@ -373,5 +373,91 @@ keys and values to set.
 Retrieves a list of all the values in a given hash. Takes the hash name.
 
     my @values = $client->hvals( 'myhash' );
+
+
+=method sadd
+
+Adds members to a set. Takes the names of the set and the members to add.
+
+    $client->sadd( 'myset', 'foo', 'bar', 'baz' );
+
+=method srem
+
+Removes members from a set. Takes the names of the set and the members
+to remove.
+
+    $client->srem( 'myset', 'foo', 'baz' );
+
+=method smembers
+
+Returns a list of all members in a set, in no particular order. Takes
+the name of the set.
+
+    my @members = $client->smembers( 'myset' );
+
+=method sismember
+
+Returns a true value if the given member is in a set. Takes the names
+of the set and the member.
+
+    if ( $client->sismember( 'myset', foo' ) ) { ... }
+
+=method zadd
+
+Adds members to a sorted set (zset). Takes the sorted set name and a list of
+score/member pairs. 
+
+    $client->zadd( 'myzset', 1 => 'foo', 2 => 'bar', 3 => 'baz' );
+
+(The ordering of the scores and member names may seem backwards if you think
+of zsets as rough analogs of hashes. That's just how Redis does it.)
+
+=method zcard
+
+Returns the cardinality (size) of a sorted set. Takes the name of the sorted set.
+
+    my $size = $client->zcard( 'myzset' );
+
+=method zcount
+
+Returns the number of members in a sorted set with scores between two values.
+Takes the name of the sorted set and the minimum and maximum
+
+    my $count = $client->zcount( 'myzset', $min, $max );
+
+=method zrange
+
+Returns all the members of a sorted set with scores between two values. Takes the
+name of the sorted set, a minimum and maximum, and an optional boolean to 
+control whether or not the scores are returned along with the members.
+
+    my @members = $client->zrange( 'myzset', $min, $max );
+    my %members_scores = $client->zrange( 'myzset', $min, $max, 1 );
+
+=method zrank
+
+Returns the index of a member within a sorted. set. Takes the names of the
+sorted set and the member.
+
+    my $rank = $client->zrank( 'myzset', 'foo' );
+
+=method zscore 
+
+Returns the score associated with a member in a sorted set. Takes the names
+of the sorted set and the member.
+
+    my $score = $client->zscore( 'myzset', 'foo' );
+
+
+=head1 CAVEATS
+
+This early release is not feature-complete. I've implemented all the Redis
+commands that I use, but there are several that are not yet implemented. There
+is also no support for Redis publish/subscribe, but I intend to add that
+soon. Patches welcome. :)
+
+
+
+=cut
 
 

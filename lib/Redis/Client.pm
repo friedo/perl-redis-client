@@ -4,6 +4,7 @@ use Moose;
 use IO::Socket::INET ();
 use Carp 'croak';
 use utf8;
+use namespace::sweep 0.003;
 
 # ABSTRACT: Perl client for Redis 2.4 and up
 
@@ -210,6 +211,8 @@ sub _read_single_line {
     return $val;
 }
 
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 

@@ -5,6 +5,7 @@ package Redis::Client::String;
 use Moose;
 with 'Redis::Client::Role::Tied';
 
+use namespace::sweep 0.003;
 use overload 
   '""'     => 'FETCH',
   '${}'    => 'FETCH',

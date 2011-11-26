@@ -1,8 +1,11 @@
 package Redis::Client::Set;
 
+# ABSTRACT: Work with Redis sets
+
 use Moose;
 with 'Redis::Client::Role::Tied';
 
+use namespace::sweep 0.003;
 use Carp 'croak';
 
 
@@ -60,6 +63,9 @@ sub NEXTKEY {
 
     return shift @{ $self->{members} };
 }
+
+
+__PACKAGE__->meta->make_immutable;
 
 
 1;

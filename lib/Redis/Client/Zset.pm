@@ -1,8 +1,11 @@
 package Redis::Client::Zset;
 
+# ABSTRACT: Work with Redis ordered sets (zsets)
+
 use Moose;
 with 'Redis::Client::Role::Tied';
 
+use namespace::sweep 0.003;
 use Carp 'croak';
 
 
@@ -68,6 +71,9 @@ sub NEXTKEY {
 
 
 1;
+
+
+__PACKAGE__->meta->make_immutable;
 
 
 __END__

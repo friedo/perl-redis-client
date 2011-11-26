@@ -1,10 +1,11 @@
 package Redis::Client::List;
 
+# ABSTRACT: Work with Redis lists
+
 use Moose;
 with 'Redis::Client::Role::Tied';
 
-# ABSTRACT: Work with Redis lists
-
+use namespace::sweep 0.003;
 use Carp 'croak';
 
 sub TIEARRAY { 

@@ -19,13 +19,17 @@ sub FETCH {
 sub STORE { 
     my ( $self, $member, $score ) = @_;
 
-    return $self->client->zadd( $self->{key}, $score, $member );
+    $self->client->zadd( $self->{key}, $score, $member );
+    return $score;
 }
 
 sub DELETE { 
     my ( $self, $member ) = @_;
 
-    return $self->client->zrem( $self->{key}, $member );
+    my $score = $self->FETCH( $member );
+    $self->client->zrem( $self->{key}, $member );
+
+    return $score;
 }
 
 sub CLEAR { 

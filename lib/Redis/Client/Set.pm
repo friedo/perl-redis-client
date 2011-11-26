@@ -17,7 +17,8 @@ sub FETCH {
 sub STORE { 
     my ( $self, $member ) = @_;
 
-    return $self->client->sadd( $self->{key}, $member );
+    $self->client->sadd( $self->{key}, $member );
+    return;
 }
 
 sub DELETE { 

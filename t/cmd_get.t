@@ -31,6 +31,5 @@ SKIP: {
     my $res3 = eval { $redis->get( 'redis_client_test_list' ) };
     ok $@;
     like $@, qr/Operation against a key holding the wrong kind of value/;
-
 }
 

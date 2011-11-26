@@ -140,7 +140,9 @@ sub _get_response {
 
     if ( $buf eq '-' ) { 
         # A Redis error. Get the error message and throw it.
-        croak sprintf 'Redis: %s', $self->$meth;
+        my $err = $self->$meth;
+        $err =~ s/ERR\s/Redis: /;
+        croak $err;
     }
 
     # otherwise get the response and return it normally.

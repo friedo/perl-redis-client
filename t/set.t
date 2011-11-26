@@ -47,15 +47,15 @@ SKIP: {
         $set{$_} = undef;
     }
 
-    ok $set{F};
-    ok $set{G};
-    ok $set{H};
+    ok exists $set{F};
+    ok exists $set{G};
+    ok exists $set{H};
 
     ok $redis->sismember( 'perl_redis_test_set', 'H' );
 
     my %members = map { $_ => 1 } keys %set; 
     foreach my $m( 'A' .. 'H' ) { 
-        ok $members{$_};
+        ok $members{$m};
     }
 
     ok exists $set{A};

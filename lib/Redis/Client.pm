@@ -12,6 +12,7 @@ has 'port'         => ( is => 'ro', isa => 'Int', default => 6379 );
 has '_sock'        => ( is => 'ro', isa => 'IO::Socket', init_arg => undef, lazy_build => 1 );
 
 BEGIN { 
+    # maps Redis commands to arity. undef = variadic.
     my %COMMANDS = 
       ( ECHO        => 1,
         TYPE        => 1,
@@ -44,6 +45,14 @@ BEGIN {
         SREM        => undef,
         SMEMBERS    => 1,
         SISMEMBER   => 2,
+
+        ZADD        => undef,
+        ZCARD       => 1,
+        ZCOUNT      => 3,
+        ZRANGE      => 3,
+        ZRANK       => 2,
+        ZREM        => undef,
+        ZSCORE      => 2,
       );
 
     foreach my $cmd ( keys %COMMANDS ) { 

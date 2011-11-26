@@ -17,20 +17,20 @@ sub FETCH {
 sub STORE { 
     my ( $self, $member ) = @_;
 
-    $self->client->sadd( $self->{key}, $member );
+    $self->_cmd( 'sadd', $member );
     return;
 }
 
 sub DELETE { 
     my ( $self, $member ) = @_;
 
-    return $self->client->srem( $self->{key}, $member );
+    return $self->_cmd( 'srem', $member );
 }
 
 sub CLEAR { 
     my ( $self ) = @_;
 
-    my @members = $self->client->smembers( $self->{key} );
+    my @members = $self->_cmd( 'smembers' );
 
     foreach my $member( @members ) { 
         $self->DELETE( $member );
@@ -40,14 +40,14 @@ sub CLEAR {
 sub EXISTS { 
     my ( $self, $member ) = @_;
 
-    return 1 if $self->client->sismember( $self->{key}, $member );
+    return 1 if $self->_cmd( 'sismember', $member );
     return 0;
 }
 
 sub FIRSTKEY { 
     my ( $self ) = @_;
 
-    my @members = $self->client->smembers( $self->{key} );
+    my @members = $self->_cmd( 'smembers' );
     return if @members == 0;
 
     $self->{members} = \@members;

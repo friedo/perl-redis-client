@@ -19,6 +19,11 @@ sub BUILD {
     }
 }
 
+sub _cmd { 
+    my ( $self, $cmd, @args ) = @_;
+
+    $self->client->$cmd( $self->{key}, @args );
+}
 
 1;
 

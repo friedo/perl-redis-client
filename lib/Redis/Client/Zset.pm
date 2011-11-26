@@ -13,13 +13,13 @@ sub TIEHASH {
 sub FETCH { 
     my ( $self, $member ) = @_;
 
-    return $self->client->zscore( $self->{key}, $member );
+    return $self->_cmd( 'zscore', $member );
 }
 
 sub STORE { 
     my ( $self, $member, $score ) = @_;
 
-    $self->client->zadd( $self->{key}, $score, $member );
+    $self->_cmd( 'zadd', $score, $member );
     return $score;
 }
 
@@ -27,7 +27,7 @@ sub DELETE {
     my ( $self, $member ) = @_;
 
     my $score = $self->FETCH( $member );
-    $self->client->zrem( $self->{key}, $member );
+    $self->_cmd( 'zrem', $member );
 
     return $score;
 }
@@ -35,7 +35,7 @@ sub DELETE {
 sub CLEAR { 
     my ( $self ) = @_;
 
-    my @members = $self->client->zrange( $self->{key}, 0, -1 );
+    my @members = $self->_cmd( 'zrange', 0, -1 );
 
     foreach my $member( @members ) { 
         $self->DELETE( $member );
@@ -45,14 +45,14 @@ sub CLEAR {
 sub EXISTS { 
     my ( $self, $member ) = @_;
 
-    return 1 if defined $self->client->zscore( $self->{key}, $member );
+    return 1 if defined $self->_cmd( 'zscore', $member );
     return 0;
 }
 
 sub FIRSTKEY { 
     my ( $self ) = @_;
 
-    my @members = $self->client->zrange( $self->{key}, 0, -1 );
+    my @members = $self->_cmd( 'zrange', 0, -1 );
     return if @members == 0;
 
     $self->{members} = \@members;

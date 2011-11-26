@@ -21,15 +21,14 @@ sub TIESCALAR {
 sub FETCH { 
     my $self = shift;
 
-    my $val = $self->client->get( $self->{key} );
-    return $val;
+    return $self->_cmd( 'get' );
 }
 
 sub STORE { 
     my $self = shift;
     my $val  = shift;
 
-    return $self->client->set( $self->{key}, $val );
+    return $self->_cmd( 'set', $val );
 }
 
 sub _num_compare { 

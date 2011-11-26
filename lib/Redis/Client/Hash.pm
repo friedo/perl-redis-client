@@ -13,14 +13,13 @@ sub TIEHASH {
 sub FETCH { 
     my ( $self, $key ) = @_;
 
-    my $val = $self->client->hget( $self->{key}, $key );
-    return $val;
+    return $self->_cmd( 'hget', $key );
 }
 
 sub STORE { 
     my ( $self, $key, $val ) = @_;
 
-    return $self->client->hset( $self->{key}, $key, $val );
+    return $self->_cmd( 'hset', $key, $val );
 }
 
 sub DELETE { 
@@ -28,7 +27,7 @@ sub DELETE {
 
     my $val = $self->FETCH( $key );
 
-    if ( $self->client->hdel( $self->{key}, $key ) ) { 
+    if ( $self->_cmd( 'hdel', $key ) ) { 
         return $val;
     }
 
@@ -38,7 +37,7 @@ sub DELETE {
 sub CLEAR { 
     my ( $self ) = @_;
 
-    my @keys = $self->client->hkeys( $self->{key} );
+    my @keys = $self->_cmd( 'hkeys' );
 
     foreach my $key( @keys ) { 
         $self->DELETE( $key );
@@ -48,14 +47,14 @@ sub CLEAR {
 sub EXISTS { 
     my ( $self, $key ) = @_;
 
-    return 1 if $self->client->hexists( $self->{key}, $key );
+    return 1 if $self->_cmd( 'hexists', $key );
     return;
 }
 
 sub FIRSTKEY { 
     my ( $self ) = @_;
 
-    my @keys = $self->client->hkeys( $self->{key} );
+    my @keys = $self->_cmd( 'hkeys' );
     return if @keys == 0;
 
     $self->{keys} = \@keys;

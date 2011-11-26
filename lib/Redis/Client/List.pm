@@ -15,20 +15,19 @@ sub TIEARRAY {
 sub FETCH { 
     my ( $self, $idx ) = @_;
 
-    my $val = $self->client->lindex( $self->{key}, $idx );
-    return $val;
+    return $self->_cmd( 'lindex', $idx );
 }
 
 sub STORE { 
     my ( $self, $idx, $val ) = @_;
 
-    return $self->client->lset( $self->{key}, $idx, $val );
+    return $self->_cmd( 'lset', $idx, $val );
 }
 
 sub FETCHSIZE { 
     my ( $self ) = @_;
 
-    return $self->client->llen( $self->{key} );
+    return $self->_cmd( 'llen' );
 }
 
 sub STORESIZE { 
@@ -54,31 +53,31 @@ sub DELETE {
 sub CLEAR { 
     my ( $self ) = @_;
 
-    return $self->client->ltrim( $self->{key}, 0, 0 );
+    return $self->_cmd( 'ltrim', 0, 0 );
 }
 
 sub PUSH { 
     my ( $self, @args ) = @_;
 
-    return $self->client->rpush( $self->{key}, @args );
+    return $self->_cmd( 'rpush', @args );
 }
 
 sub POP { 
     my ( $self ) = @_;
 
-    return $self->client->rpop( $self->{key} );
+    return $self->_cmd( 'rpop' );
 }
 
 sub UNSHIFT { 
     my ( $self, @args ) = @_;
 
-    return $self->client->lpush( $self->{key}, @args );
+    return $self->_cmd( 'lpush', @args );
 }
 
 sub SHIFT { 
     my ( $self ) = @_;
 
-    return $self->client->lpop( $self->{key} );
+    return $self->_cmd( 'lpop' );
 }
 
 sub SPLICE { 

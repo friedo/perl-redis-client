@@ -141,6 +141,11 @@ order.
 
     while( my ( $key, $val ) = each %zset ) { ... }
 
+=head1 CAVEATS
+
+As of Redis 2.4, emptying a zset (with e.g. C<%zset = ( )> is equivalent
+to deleting it from the store.
+
 =back
 
 =head1 SEE ALSO

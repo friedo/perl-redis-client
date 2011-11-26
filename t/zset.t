@@ -5,7 +5,7 @@ use warnings;
 
 use lib 't';
 
-use Test::More tests => 29;
+use Test::More tests => 28;
 use Data::Dumper;
 
 use RedisClientTest;
@@ -31,7 +31,7 @@ undef $@;
 SKIP: { 
     my $redis = RedisClientTest->server;
 
-    skip 'No Redis server available', 26 unless $redis;
+    skip 'No Redis server available', 25 unless $redis;
     
     ok $redis;
     isa_ok $redis, 'Redis::Client';
@@ -55,7 +55,8 @@ SKIP: {
     my @members = keys %zset; 
     my $tval = 0;
     foreach my $m( @members ) { 
-        ok $zset{$m} = $tval++;
+        my $splort = ( $zset{$m} = ++$tval );
+        is $splort, $tval;
     }
 
     ok exists $zset{A};
@@ -64,14 +65,18 @@ SKIP: {
     ok delete $zset{C};
     ok !exists $zset{C};
 
-    %zset = ( );
-    my @members2 = keys %zset;
-    ok @members2 == 0;
+    # %zset = ( );
+    # my @members2 = keys %zset;
+    # ok @members2 == 0;
 
     $zset{blorp} = 2;
     ok exists $zset{blorp};
 
-    ok $redis->del( 'perl_redis_test_zset' );
+    my $score = delete $zset{blorp};
+    is $score, 2;
+
+    my $del_res = $redis->del( 'perl_redis_test_zset' );
+    is $del_res, 1;
 }
 
 

@@ -34,16 +34,16 @@ BEGIN {
         LPOP        => 1,
 
         # hash commands
-        HGET        => 2,
-        HSET        => 3,
         HDEL        => undef,
         HEXISTS     => 2,
+        HGET        => 2,
         HGETALL     => 1,
         HKEYS       => 1,
-        HVALS       => 1,
         HLEN        => 1,
         HMGET       => undef,
         HMSET       => undef,
+        HSET        => 3,
+        HVALS       => 1,
 
         # set commands
         SADD        => undef,
@@ -285,7 +285,7 @@ usage:
 
 =back
 
-=method new
+=class_method new
 
 Constructor. Returns a new C<Redis::Client> object for talking to a Redis server. Throws a fatal error
 if a connection cannot be obtained.
@@ -307,19 +307,20 @@ Redis connection passwords are not currently supported.
     my $client = Redis::Client->new( host => 'foo.example.com', port => 1234 );
 
 
-=method del
+=key_method del
 
 Deletes keys. Takes a list of key names. Returns the number of keys deleted.
 
     $client->del( 'foo', 'bar', 'baz' );
 
-=method echo
+=key_method type
 
-Returns whatever you send it. Useful for testing only. Takes one argument.
+Retrieves the type of a key. Takes the key name and returns one of C<string>, C<list>, 
+C<hash>, C<set>, or C<zset>.
 
-    print $client->echo( "Hello, World!" );
+    my $type = $client->type( 'some_key' );
 
-=method get
+=str_method get
 
 Retrieves a string value associated with a key. Takes one key name. Returns C<undef> if the
 key does not exist. If the key is associated with something other than a string,
@@ -327,7 +328,74 @@ a fatal error is thrown.
 
     print $client->get( 'mykey' );
 
-=method hdel
+=str_method set
+
+Sets the value of a string. Takes the key name and a value. 
+
+    $client->set( my_key => 'foobar' );
+
+=list_method lindex
+
+Retrieves the value stored at a particular index in a list. Takes the list name
+and the numeric index. 
+
+    my $val = $client->lindex( 'my_list', 42 );
+
+=list_method lset
+
+Sets the value at a particular index in a list. Takes the list name, the numeric
+index, and the new value.
+
+    $client->lset( 'my_list', 42, 'yippee!' );
+
+=list_method llen
+
+Retrieves the number of items in a list. Takes the list name.
+
+    my $length = $client->llen( 'my_list' );
+
+=list_method ltrim
+
+Removes all elements of a list outside of the specified range. Takes the list 
+name, start index, and stop index. All keys between the start and stop indices
+(inclusive) will be preserved. The rest will be deleted. The list is shifted down
+if the start index is not zero. The stop index C<-1> can be used to select everything
+until the end of the list.
+
+    # get rid of first two elements.
+    $client->ltrim( 'my_list', 2, -1 );
+
+=list_method rpush
+
+Adds items to the end of a list, analogous to the Perl C<push> operator. Takes 
+the list name and a list of items to add. Returns the length of the list when
+done.
+
+    my $new_length = $client->rpush( my_list => 42, 43, 'narf', 'poit' );
+
+=list_method rpop
+
+Removes and returns the last element of a list, analogous to the Perl C<pop>
+operator. 
+
+    my $last = $client->rpop( 'my_list' );
+
+=list_method lpush
+
+Adds items to the beginning of a list, analogous to the Perl C<unshift> operator. 
+Takes the list name and a list of items to add. Returns the length of the list 
+when done.
+
+    my $new_length = $client->lpush( my_list => 1, 2, 3 );
+
+=list_method lpop
+
+Removes and returns the first element of a list, analogous to the Perl C<shift>
+operator. 
+
+    my $first = $client->lpop( 'my_list' );
+
+=hash_method hdel
 
 Deletes keys from a hash. Takes the name of a hash and a list of key names to delete. 
 Returns the number of keys deleted. Returns zero if the hash does not exist, or if
@@ -335,13 +403,13 @@ none of the keys specified exist in the hash.
 
     $client->hdel( 'myhash', 'foo', 'bar', 'baz' );
 
-=method hexists
+=hash_method hexists
 
 Returns a true value if a key exists in a hash. Takes a hash name and the key name.
 
     blah() if $client->hexists( 'myhash', 'foo' );
 
-=method hget
+=hash_method hget
 
 Retrieves a value associated with a key in a hash. Takes the name of the hash
 and the key within the hash. Returns C<undef> if the hash or the key within the
@@ -352,21 +420,27 @@ hash does not exist. (Use L<exists> to determine if a key exists at all.)
 
     print $client->hget( 'foo', 'key' );   # 42
 
-=method hgetall
+=hash_method hgetall
 
 Retrieves all of the keys and values in a hash. Takes the name of the hash
 and returns a list of key/value pairs. 
 
     my %hash = $client->hgetall( 'myhash' );
 
-=method hkeys
+=hash_method hkeys
 
 Retrieves a list of all the keys in a hash. Takes the name of the hash and
 returns a list of keys.
 
     my @keys = $client->hkeys( 'myhash' );
 
-=method hmget
+=hash_method hlen
+
+Retrieves the number of keys in a hash. Takes the name of the hash.
+
+    my $size = $client->hlen( 'myhash' );
+
+=hash_method hmget
 
 Retrieves a list of values associated with the given keys in a hash. Takes
 the name of the hash and a list of keys. If a given key does not exist, 
@@ -374,48 +448,48 @@ C<undef> will be returned in the corresponding location in the result list.
 
     my @values = $client->hmget( 'myhash', 'key1', 'key2', 'key3' );
 
-=method hmset
+=hash_method hmset
 
 Sets a list of key/value pairs in a hash. Takes the hash name and a list of
 keys and values to set. 
 
     $client->hmset( 'myhash', foo => 1, bar => 2, baz => 3 );
 
-=method hvals
+=hash_method hvals
 
 Retrieves a list of all the values in a given hash. Takes the hash name.
 
     my @values = $client->hvals( 'myhash' );
 
 
-=method sadd
+=set_method sadd
 
 Adds members to a set. Takes the names of the set and the members to add.
 
     $client->sadd( 'myset', 'foo', 'bar', 'baz' );
 
-=method srem
+=set_method srem
 
 Removes members from a set. Takes the names of the set and the members
 to remove.
 
     $client->srem( 'myset', 'foo', 'baz' );
 
-=method smembers
+=set_method smembers
 
 Returns a list of all members in a set, in no particular order. Takes
 the name of the set.
 
     my @members = $client->smembers( 'myset' );
 
-=method sismember
+=set_method sismember
 
 Returns a true value if the given member is in a set. Takes the names
 of the set and the member.
 
     if ( $client->sismember( 'myset', foo' ) ) { ... }
 
-=method zadd
+=zset_method zadd
 
 Adds members to a sorted set (zset). Takes the sorted set name and a list of
 score/member pairs. 
@@ -425,20 +499,20 @@ score/member pairs.
 (The ordering of the scores and member names may seem backwards if you think
 of zsets as rough analogs of hashes. That's just how Redis does it.)
 
-=method zcard
+=zset_method zcard
 
 Returns the cardinality (size) of a sorted set. Takes the name of the sorted set.
 
     my $size = $client->zcard( 'myzset' );
 
-=method zcount
+=zset_method zcount
 
 Returns the number of members in a sorted set with scores between two values.
 Takes the name of the sorted set and the minimum and maximum
 
     my $count = $client->zcount( 'myzset', $min, $max );
 
-=method zrange
+=zset_method zrange
 
 Returns all the members of a sorted set with scores between two values. Takes the
 name of the sorted set, a minimum and maximum, and an optional boolean to 
@@ -447,19 +521,27 @@ control whether or not the scores are returned along with the members.
     my @members = $client->zrange( 'myzset', $min, $max );
     my %members_scores = $client->zrange( 'myzset', $min, $max, 1 );
 
-=method zrank
+=zset_method zrank
 
 Returns the index of a member within a sorted. set. Takes the names of the
 sorted set and the member.
 
     my $rank = $client->zrank( 'myzset', 'foo' );
 
-=method zscore 
+=zset_method zscore 
 
 Returns the score associated with a member in a sorted set. Takes the names
 of the sorted set and the member.
 
     my $score = $client->zscore( 'myzset', 'foo' );
+
+
+=conn_method echo
+
+Returns whatever you send it. Useful for testing only. Takes one argument.
+
+    print $client->echo( "Hello, World!" );
+
 
 
 =head1 CAVEATS

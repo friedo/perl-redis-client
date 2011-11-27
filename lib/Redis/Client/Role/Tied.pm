@@ -1,5 +1,7 @@
 package Redis::Client::Role::Tied;
 
+# ABSTRACT: Role for tied things that talk to Redis
+
 use Moose::Role;
 use Carp 'croak';
 use Scalar::Util 'blessed';

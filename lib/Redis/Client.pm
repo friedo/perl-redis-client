@@ -13,15 +13,17 @@ has 'port'         => ( is => 'ro', isa => 'Int', default => 6379 );
 has '_sock'        => ( is => 'ro', isa => 'IO::Socket', init_arg => undef, lazy_build => 1 );
 
 BEGIN { 
-    # maps Redis commands to arity. undef = variadic.
+    # maps Redis commands to arity; undef implies variadic
     my %COMMANDS = 
-      ( ECHO        => 1,
+      ( # key commands
+        DEL         => undef,
         TYPE        => 1,
 
+        # string commands
         SET         => 2,
-        DEL         => undef,
         GET         => 1,
 
+        # list commands
         LINDEX      => 2,
         LSET        => 3,
         LLEN        => 1,
@@ -31,6 +33,7 @@ BEGIN {
         LPUSH       => undef,
         LPOP        => 1,
 
+        # hash commands
         HGET        => 2,
         HSET        => 3,
         HDEL        => undef,
@@ -42,11 +45,13 @@ BEGIN {
         HMGET       => undef,
         HMSET       => undef,
 
+        # set commands
         SADD        => undef,
         SREM        => undef,
         SMEMBERS    => 1,
         SISMEMBER   => 2,
 
+        # zset commands
         ZADD        => undef,
         ZCARD       => 1,
         ZCOUNT      => 3,
@@ -54,6 +59,11 @@ BEGIN {
         ZRANK       => 2,
         ZREM        => undef,
         ZSCORE      => 2,
+
+
+        # connection commands
+        ECHO        => 1,
+
       );
 
     foreach my $cmd ( keys %COMMANDS ) { 

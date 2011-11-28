@@ -41,14 +41,6 @@ sub transform_document {
     $doc->children( \@new_children );
 }
 
-sub weave_section { 
-    my ( $self, $doc, $input ) = @_;
-
-#    warn sprintf 'doc = [%s]', $doc;
-#    warn sprintf 'inp = [%s]', Dumper( $input );
-}
-
-
 __PACKAGE__->meta->make_immutable;
 
 1;

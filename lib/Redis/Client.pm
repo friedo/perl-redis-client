@@ -10,60 +10,139 @@ use namespace::sweep 0.003;
 
 has 'host'         => ( is => 'ro', isa => 'Str', default => 'localhost' );
 has 'port'         => ( is => 'ro', isa => 'Int', default => 6379 );
-has '_sock'        => ( is => 'ro', isa => 'IO::Socket', init_arg => undef, lazy_build => 1 );
+has '_sock'        => ( is => 'ro', isa => 'IO::Socket', init_arg => undef, lazy_build => 1, 
+                        predicate => '_have_sock', clearer => '_clear_sock' );
 
 BEGIN { 
     # maps Redis commands to arity; undef implies variadic
     my %COMMANDS = 
       ( # key commands
         DEL         => undef,
+        EXISTS      => 1,
+        EXPIRE      => 2,
+        EXPITEAT    => 2,
+        KEYS        => 1,
+        MOVE        => 2,
+        OBJECT      => undef,
+        PERSIST     => 1,
+        RANDOMKEY   => 0,
+        RENAME      => 2,
+        RENAMENX    => 2,
+        SORT        => undef,
+        TTL         => 1,
         TYPE        => 1,
-
+        EVAL        => undef,
+       
         # string commands
-        SET         => 2,
+        APPEND      => 2,
+        DECR        => 1,
+        DECRBY      => 2, 
         GET         => 1,
+        GETBIT      => 2,
+        GETRANGE    => 3,
+        GETSET      => 2,
+        INCR        => 1,
+        INCRBY      => 2,
+        MGET        => undef,
+        MSET        => undef,
+        MSETNX      => undef,
+        SET         => 2,
+        SETBIT      => 3,
+        SETEX       => 3,
+        SETNX       => 2,
+        SETRANGE    => 3,
+        STRLEN      => 1,
 
         # list commands
+        BLPOP       => undef,
+        BRPOP       => undef,
+        BRPOPLPUSH  => 3,
         LINDEX      => 2,
-        LSET        => 3,
+        LINSERT     => 4,
         LLEN        => 1,
-        LTRIM       => 3,
-        RPUSH       => undef,
-        RPOP        => 1,
-        LPUSH       => undef,
         LPOP        => 1,
+        LPUSH       => undef,
+        LPUSHX      => 2,
+        LRANGE      => 3,
+        LREM        => 3,
+        LSET        => 3,
+        LTRIM       => 3,
+        RPOP        => 1,
+        RPOPLPUSH   => 2,
+        RPUSH       => undef,
+        RPUSHX      => 2,
 
         # hash commands
         HDEL        => undef,
         HEXISTS     => 2,
         HGET        => 2,
         HGETALL     => 1,
+        HINCRBY     => 3,
         HKEYS       => 1,
         HLEN        => 1,
         HMGET       => undef,
         HMSET       => undef,
         HSET        => 3,
+        HSETNX      => 3,
         HVALS       => 1,
 
         # set commands
         SADD        => undef,
-        SREM        => undef,
-        SMEMBERS    => 1,
+        SCARD       => 1,
+        SDIFF       => undef,
+        SDIFFSTORE  => undef,
+        SINTER      => undef,
+        SINTERSTORE => undef,
         SISMEMBER   => 2,
+        SMEMBERS    => 1,
+        SMOVE       => 3,
+        SPOP        => 1,
+        SRANDMEMBER => 1,
+        SREM        => undef,
+        SUNION      => undef,
+        SUNIONSTORE => undef,
 
         # zset commands
         ZADD        => undef,
         ZCARD       => 1,
         ZCOUNT      => 3,
+        ZINCRBY     => 3,
+        ZINTERSTORE => undef,
         ZRANGE      => undef,
+        ZRANGEBYSCORE => undef,
         ZRANK       => 2,
         ZREM        => undef,
+        ZREMRANGEBYRANK => 3,
+        ZREMRANGEBYSCORE => undef,
+        ZREVRANK    => 2,
         ZSCORE      => 2,
-
+        ZUNIONSTORE => undef,
 
         # connection commands
+        AUTH        => 1,
         ECHO        => 1,
+        PING        => 0,
+        QUIT        => 0,
+        SELECT      => 1,
 
+        # server commands
+        BGREWRITEAOF => 0,
+        BGSAVE      => 0,
+        'CONFIG GET' => 1,
+        'CONFIG SET' => 2,
+        'CONFIG RESETSTAT' => 0,
+        DBSIZE      => 0,
+        'DEBUG OBJECT' => 1,
+        'DEBUG SEGFAULT' => 0,
+        FLUSHALL    => 0,
+        FLUSHDB     => 0,
+        INFO        => 0,
+        LASTSAVE    => 0,
+        SAVE        => 0,
+        SHUTDOWN    => 0,
+        SLAVEOF     => 2,
+        SLOWLOG     => undef,
+        SYNC        => 0,
       );
 
     foreach my $cmd ( keys %COMMANDS ) { 
@@ -79,7 +158,11 @@ BEGIN {
             return $self->_send_command( $cmd, @args );
         };
 
-        __PACKAGE__->meta->add_method( lc $cmd, $meth );
+        # some commands have spaces in them. yeesh.
+        my $meth_name = lc $cmd;
+        $meth_name =~ s/\s/_/g;
+
+        __PACKAGE__->meta->add_method( $meth_name => $meth );
     }
 };
 
@@ -97,6 +180,12 @@ foreach my $func( 'lpush', 'rpush' ) {
         $self->$orig( @args );
     };
 }
+
+# don't try to send commands on disconnected socket
+after quit => sub { 
+    my $self = shift;
+    $self->_clear_sock;
+};
 
 
 sub _build__sock { 
@@ -413,7 +502,7 @@ Returns a true value if a key exists in a hash. Takes a hash name and the key na
 
 Retrieves a value associated with a key in a hash. Takes the name of the hash
 and the key within the hash. Returns C<undef> if the hash or the key within the
-hash does not exist. (Use L<exists> to determine if a key exists at all.)
+hash does not exist. (Use L</hexists> to determine if a key exists at all.)
 
     # sets the value for 'key' in the hash 'foo'
     $client->hset( 'foo', key => 42 );
@@ -551,7 +640,9 @@ commands that I use, but there are several that are not yet implemented. There
 is also no support for Redis publish/subscribe, but I intend to add that
 soon. Patches welcome. :)
 
-
+The L<MONITOR|http://redis.io/commands/monitor> command will probably not be
+supported any time soon since it would require some kind of asynchronous 
+solution and does not use the URP.
 
 =cut
 

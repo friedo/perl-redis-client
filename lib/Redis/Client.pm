@@ -610,14 +610,14 @@ control whether or not the scores are returned along with the members.
     my @members = $client->zrange( 'myzset', $min, $max );
     my %members_scores = $client->zrange( 'myzset', $min, $max, 1 );
 
-=zset_method zrank
+=zset_method zrank  
 
 Returns the index of a member within a sorted. set. Takes the names of the
 sorted set and the member.
 
     my $rank = $client->zrank( 'myzset', 'foo' );
 
-=zset_method zscore 
+=zset_method zscore  
 
 Returns the score associated with a member in a sorted set. Takes the names
 of the sorted set and the member.

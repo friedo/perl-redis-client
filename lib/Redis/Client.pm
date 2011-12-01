@@ -150,7 +150,8 @@ BEGIN {
             my $self = shift;
             my @args = @_;
 
-            if ( my $args_num = $COMMANDS{$cmd} ) { 
+            my $args_num = $COMMANDS{$cmd};
+            if ( defined $args_num ) { 
                 croak sprintf( 'Redis %s command requires %s arguments', $cmd, $args_num )
                   unless @args == $args_num;
             }

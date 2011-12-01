@@ -4,7 +4,6 @@ package Pod::Weaver::Plugin::RedisLinks;
 
 use Moose;
 with 'Pod::Weaver::Role::Transformer';
-with 'Pod::Weaver::Role::Section';
 
 use Data::Dumper;
 use Scalar::Util 'blessed';
@@ -15,7 +14,6 @@ sub transform_document {
 
     my @children = $doc->children;
     
-    my $flag;
     my @new_children;
     foreach my $child( @{ $children[0] } ) { 
         if ( $child->can( 'command' ) && $child->command =~ /^(?:key|str|list|hash|set|zset|conn|serv)_method/ ) { 

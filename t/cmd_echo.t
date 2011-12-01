@@ -2,24 +2,21 @@
 
 use strict;
 use warnings;
-
+use utf8;
 use lib 't';
 
-use Test::More tests => 4;
+use Test::More;
+
+# ABSTRACT: Tests for the Redis ECHO command.
 
 use_ok 'RedisClientTest';
 
-SKIP: { 
-    my $redis = RedisClientTest->server;
-    
-    skip 'No Redis server available', 3 unless $redis;
-    
-    ok $redis;
-    isa_ok $redis, 'Redis::Client';
+my $redis = RedisClientTest->server;
+done_testing && exit unless $redis;
 
-    my $result = $redis->echo( "Hello, World!" );
-    
-    is $result, 'Hello, World!';
+isa_ok $redis, 'Redis::Client';
 
-}
+# TODO: write tests!
+
+done_testing;
 

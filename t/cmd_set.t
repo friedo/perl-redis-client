@@ -2,27 +2,21 @@
 
 use strict;
 use warnings;
-
+use utf8;
 use lib 't';
 
-use Test::More tests => 5;
+use Test::More;
+
+# ABSTRACT: Tests for the Redis SET command.
 
 use_ok 'RedisClientTest';
 
-SKIP: { 
-    my $redis = RedisClientTest->server;
-    
-    skip 'No Redis server available', 4 unless $redis;
-    
-    ok $redis;
-    isa_ok $redis, 'Redis::Client';
+my $redis = RedisClientTest->server;
+done_testing && exit unless $redis;
 
-    my $result = $redis->set( perl_redis_client_test => 'foobar' );
-    
-    is $result, 'OK';
+isa_ok $redis, 'Redis::Client';
 
-    my $result2 = $redis->del( 'perl_redis_client_test' );
+# TODO: write tests!
 
-    is $result2, 1;
-}
+done_testing;
 

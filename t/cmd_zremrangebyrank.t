@@ -7,7 +7,7 @@ use lib 't';
 
 use Test::More;
 
-# ABSTRACT: Tests for the Redis HKEYS command.
+# ABSTRACT: Tests for the Redis ZREMRANGEBYRANK command.
 
 use_ok 'RedisClientTest';
 

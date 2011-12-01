@@ -7,7 +7,7 @@ use lib 't';
 
 use Test::More;
 
-# ABSTRACT: Tests for the Redis HKEYS command.
+# ABSTRACT: Tests for the Redis DEBUG OBJECT command.
 
 use_ok 'RedisClientTest';
 

@@ -2,26 +2,21 @@
 
 use strict;
 use warnings;
-
+use utf8;
 use lib 't';
 
-use Test::More tests => 5;
-use RedisClientTest;
+use Test::More;
+
+# ABSTRACT: Tests for the Redis LPUSH command.
+
 use_ok 'RedisClientTest';
 
-SKIP: { 
-    my $redis = RedisClientTest->server;
+my $redis = RedisClientTest->server;
+done_testing && exit unless $redis;
 
-    skip 'No Redis server available', 4 unless $redis;
-    
-    ok $redis;
-    isa_ok $redis, 'Redis::Client';
-    
-    my $res = $redis->lpush( perl_redis_test_list => 42 );
+isa_ok $redis, 'Redis::Client';
 
-    is $res, 1;
+# TODO: write tests!
 
-    my $res2 = $redis->del( 'perl_redis_test_list' );
+done_testing;
 
-    is $res2, 1;
-}

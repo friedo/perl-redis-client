@@ -16,7 +16,22 @@ done_testing && exit unless $redis;
 
 isa_ok $redis, 'Redis::Client';
 
-# TODO: write tests!
+$redis->mset( perl_redis_test_mset_1 => 'foo', 
+              perl_redis_test_mset_2 => 'bar', 
+              perl_redis_test_mset_3 => 'baz' );
+
+my $val1 = $redis->get( 'perl_redis_test_mset_1' );
+my $val2 = $redis->get( 'perl_redis_test_mset_2' );
+my $val3 = $redis->get( 'perl_redis_test_mset_3' );
+
+is $val1, 'foo';
+is $val2, 'bar';
+is $val3, 'baz';
+
+ok $redis->del( 'perl_redis_test_mset_1' );
+ok $redis->del( 'perl_redis_test_mset_2' );
+ok $redis->del( 'perl_redis_test_mset_3' );
+
 
 done_testing;
 

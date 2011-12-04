@@ -519,6 +519,13 @@ place.
     my @vals = $client->mget( 'foo', 'bar', baz' );
     print $vals[2];    # value of baz
 
+=str_method mset
+
+Sets the values of multiple strings. Takes a list of key/value pairs to set.
+If a key does not exist, it will be created. If a key is not a string, it will
+be silently converted to one. Therefore, use with caution.
+
+    $client->mset( foo => 1, bar => 2, baz => 3 );
 
 
 =str_method set

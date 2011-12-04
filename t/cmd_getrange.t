@@ -36,5 +36,7 @@ eval { $redis->getrange( 'perl_redis_test_list', 1, 2 ) };
 
 like $@, qr/wrong kind of value/;
 
+ok $redis->del( 'perl_redis_test_list' );
+
 done_testing;
 

@@ -16,7 +16,17 @@ done_testing && exit unless $redis;
 
 isa_ok $redis, 'Redis::Client';
 
-# TODO: write tests!
+$redis->set( perl_redis_test_append => 'foo' );
+
+my $length = $redis->append( perl_redis_test_append => 'bar' );
+
+is $length, 6;
+
+my $new = $redis->get( 'perl_redis_test_append' );
+
+is $new, 'foobar';
+
+ok $redis->del( 'perl_redis_test_append' );
 
 done_testing;
 

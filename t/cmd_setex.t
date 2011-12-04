@@ -16,7 +16,14 @@ done_testing && exit unless $redis;
 
 isa_ok $redis, 'Redis::Client';
 
-# TODO: write tests!
+$redis->setex( 'perl_redis_test_setex', 1, 'foo' );
+my $val = $redis->get( 'perl_redis_test_setex' );
+is $val, 'foo';
+
+sleep 2;
+
+my $val2 = $redis->get( 'perl_redis_test_setex' );
+is $val2, undef;
 
 done_testing;
 

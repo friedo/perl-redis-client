@@ -548,6 +548,13 @@ if the bit value is not 0 or 1, a fatal error is thrown.
 
     my $old_bit = $client->setbit( 'my_key', 3, 1 );
 
+=str_method setex
+
+Sets the value of a string and its expiration time in seconds. Takes the key name,
+the expiration time, and the value. 
+
+    $client->setex( 'my_key', 5, 'foo' );   # goes bye-bye in 5 secs.
+
 =list_method lindex
 
 Retrieves the value stored at a particular index in a list. Takes the list name

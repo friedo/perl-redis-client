@@ -469,6 +469,14 @@ fatal error is thrown.
 
     my $val = $client->get( 'my_key' );
 
+=str_methdod getbit
+
+Returns the value of one bit in a string. Takes the key name and the offset of
+the bit. If the offset is beyond the length of the string, C<0> is returned.
+If the key is not a string, a fatal error is thrown.
+
+    my $bit = $client->getbit( 'my_key', 4 );    # fifth bit from left
+
 =str_method set
 
 Sets the value of a string. Takes the key name and a value. 

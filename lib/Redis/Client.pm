@@ -540,6 +540,14 @@ Sets the value of a string. Takes the key name and a value.
 
     $client->set( my_key => 'foobar' );
 
+=str_method setbit
+
+Sets the value of one bit in a string. Takes the key name, offset of the bit, and
+new value. Returns the original value of the bit. If the key is not a string or
+if the bit value is not 0 or 1, a fatal error is thrown.
+
+    my $old_bit = $client->setbit( 'my_key', 3, 1 );
+
 =list_method lindex
 
 Retrieves the value stored at a particular index in a list. Takes the list name

@@ -494,6 +494,15 @@ thrown. If the key does not exist, it is created and C<undef> is returned.
 
     my $old_val = $client->getset( my_key => 'new value' );
 
+=str_method incr
+
+Increments a number stored in a string. Takes the key name and returns the incremented
+value. If the key does not exist, zero is assumed and incremented to 1. If the key
+is not a string, a fatal error is thrown.
+
+    my $new_val = $client->incr( 'my_num' );
+
+
 =str_method set
 
 Sets the value of a string. Takes the key name and a value. 

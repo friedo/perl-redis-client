@@ -510,6 +510,16 @@ a fatal error is thrown.
 
     my $new_val = $client->incrby( 'my_num', 3 );
 
+=str_method mget
+
+Gets the values of multiple strings. Takes the list of key names to get. If a
+key does not exist or if it is not a string, C<undef> will be returned in its
+place.
+
+    my @vals = $client->mget( 'foo', 'bar', baz' );
+    print $vals[2];    # value of baz
+
+
 
 =str_method set
 

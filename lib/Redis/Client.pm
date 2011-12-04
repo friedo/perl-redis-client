@@ -438,6 +438,12 @@ a fatal error is thrown.
 
     print $client->get( 'mykey' );
 
+=str_method append
+
+Appends a value to the end of a string. Takes the key name and a value to append.
+Returns the new length of the string. If the key is not a string, a fatal error
+is thrown.
+
 =str_method set
 
 Sets the value of a string. Takes the key name and a value. 

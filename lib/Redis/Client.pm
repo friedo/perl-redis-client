@@ -444,6 +444,16 @@ Appends a value to the end of a string. Takes the key name and a value to append
 Returns the new length of the string. If the key is not a string, a fatal error
 is thrown.
 
+    my $new_length = $client->append( mykey => 'foobar' );
+
+=str_method decr
+
+Decrements a number stored in a string. Takes the key name and returns the decremented
+value. If the key does not exist, zero is assumed and decremented to -1. If the key
+is not a string, a fatal error is thrown.
+
+    my $new_val = $client->decr( 'my_num' );
+
 =str_method set
 
 Sets the value of a string. Takes the key name and a value. 

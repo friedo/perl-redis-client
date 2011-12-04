@@ -562,6 +562,10 @@ and value. Returns 1 on success, 0 otherwise.
 
     my $key_was_set = $client->setnx( my_key => 'foobar' ); 
 
+=str_method setrange
+
+Sets the value of a substring 
+
 =list_method lindex
 
 Retrieves the value stored at a particular index in a list. Takes the list name

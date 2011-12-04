@@ -240,15 +240,15 @@ usage:
 
 =over
 
-=item L<Redis::Client::String>
+=item * L<Redis::Client::String>
 
-=item L<Redis::Client::List>
+=item * L<Redis::Client::List>
 
-=item L<Redis::Client::Hash>
+=item * L<Redis::Client::Hash>
 
-=item L<Redis::Client::Set>
+=item * L<Redis::Client::Set>
 
-=item L<Redis::Client::Zset>
+=item * L<Redis::Client::Zset>
 
 =back
 
@@ -260,11 +260,11 @@ variables prior to installing this distribution or running the test suite.
 
 =over
 
-=item C<PERL_REDIS_TEST_SERVER> - the hostname of the Redis server (default localhost).
+=item * C<PERL_REDIS_TEST_SERVER> - the hostname of the Redis server (default localhost).
 
-=item C<PERL_REDIS_TEST_PORT> - the port number of the Redis server (default 6379).
+=item * C<PERL_REDIS_TEST_PORT> - the port number of the Redis server (default 6379).
 
-=item C<PERL_REDIS_TEST_PASSWORD> - (optional) the Redis server password (default C<undef>).
+=item * C<PERL_REDIS_TEST_PASSWORD> - (optional) the Redis server password (default C<undef>).
 
 =back
 
@@ -453,6 +453,16 @@ Returns the length of a string. Takes the key name. If the key is not a string,
 a fatal error is thrown.
 
     my $length = $client->strlength( 'my_key' );
+
+=list_method blpop
+
+Blocking list pop. Takes a list of keys to poll and a timeout in seconds. Returns
+a two-element list containing the name of the list and the popped value on 
+success, C<undef> otherwise. Returns immediately if a value is waiting on any 
+of the specified lists, otherwise waits for a value to appear or the timeout
+to expire. A timeout of zero waits forever. 
+
+    my ( $list, $value ) = $client->blpop( 'list1', 'list2', 5 ); # wait 5 secs
 
 =list_method lindex
 

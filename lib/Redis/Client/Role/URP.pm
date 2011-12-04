@@ -3,6 +3,9 @@ package Redis::Client::Role::URP;
 # ABSTRACT: Role for the Redis Unified Request Protocol
 
 use Moose::Role;
+use Carp 'croak';
+
+our @CARP_NOT = ( 'Redis::Client' );     # report errors from the right place
 
 my $CRLF = "\x0D\x0A";
 

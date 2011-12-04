@@ -555,6 +555,13 @@ the expiration time, and the value.
 
     $client->setex( 'my_key', 5, 'foo' );   # goes bye-bye in 5 secs.
 
+=str_method setnx
+
+Sets the value of a string, only if it I<does not> yet exist. Takes the key name
+and value. Returns 1 on success, 0 otherwise.
+
+    my $key_was_set = $client->setnx( my_key => 'foobar' ); 
+
 =list_method lindex
 
 Retrieves the value stored at a particular index in a list. Takes the list name

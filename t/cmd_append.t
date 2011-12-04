@@ -28,5 +28,12 @@ is $new, 'foobar';
 
 ok $redis->del( 'perl_redis_test_append' );
 
+$redis->lpush( perl_redis_test_list => 1 );
+eval { $redis->append( perl_redis_test_list => 2 ) };
+
+like $@, qr/wrong kind of value/;
+
+ok $redis->del( 'perl_redis_test_list' );
+
 done_testing;
 

@@ -289,7 +289,7 @@ sub _read_bulk_reply {
     my $length = readline $sock;
     chomp $length;
 
-    return if $length == -1;    # null response
+    return undef if $length == -1;    # null response
 
     my $buf;
     $sock->read( $buf, $length );

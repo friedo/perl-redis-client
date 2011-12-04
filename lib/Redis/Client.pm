@@ -502,6 +502,14 @@ is not a string, a fatal error is thrown.
 
     my $new_val = $client->incr( 'my_num' );
 
+=str_method incrby
+
+Increments a number stored in a string by a certain amount. Takes the key name and
+the amount by which to increment. Returns the new value. If the key is not a string,
+a fatal error is thrown.
+
+    my $new_val = $client->incrby( 'my_num', 3 );
+
 
 =str_method set
 

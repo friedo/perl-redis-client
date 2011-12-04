@@ -16,7 +16,21 @@ done_testing && exit unless $redis;
 
 isa_ok $redis, 'Redis::Client';
 
-# TODO: write tests!
+$redis->set( perl_redis_test_get => 'foobar' );
+
+my $val = $redis->get( 'perl_redis_test_get' );
+
+is $val, 'foobar';
+
+ok $redis->del( 'perl_redis_test_get' );
+
+$redis->lpush( perl_redis_test_list => 1 );
+
+eval { $redis->get( 'perl_redis_test_list' ) };
+
+like $@, qr/wrong kind of value/;
+
+ok $redis->del( 'perl_redis_test_list' );
 
 done_testing;
 

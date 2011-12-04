@@ -462,6 +462,13 @@ a fatal error is thrown.
 
     my $new_val = $client->decrby( 'my_num', 3 );
 
+=str_method get
+
+Returns the value of a string. Takes the key name. If the key is not a string, a
+fatal error is thrown.
+
+    my $val = $client->get( 'my_key' );
+
 =str_method set
 
 Sets the value of a string. Takes the key name and a value. 

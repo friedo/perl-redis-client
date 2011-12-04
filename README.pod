@@ -604,6 +604,8 @@ solution and does not use the URP.
 
 =item L<Redis::Client::Role::URP>
 
+=back
+
 =head1 AUTHOR
 
 Mike Friedman <friedo@friedo.com>

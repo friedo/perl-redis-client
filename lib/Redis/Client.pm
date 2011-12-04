@@ -477,6 +477,16 @@ If the key is not a string, a fatal error is thrown.
 
     my $bit = $client->getbit( 'my_key', 4 );    # fifth bit from left
 
+=str_method getrange
+
+Returns a substring of a string, specified by a range. Takes the key name and
+the start and end offset of the range. Negative numbers count from the end.
+If the key is not a string, a fatal error is thrown.
+
+    my $substr = $client->getrange( 'my_key', 3, 5 );
+    my $substr = $client->getrange( 'my_key', -5, -1 );  # last five 
+
+
 =str_method set
 
 Sets the value of a string. Takes the key name and a value. 

@@ -16,7 +16,25 @@ done_testing && exit unless $redis;
 
 isa_ok $redis, 'Redis::Client';
 
-# TODO: write tests!
+$redis->set( perl_redis_test_getrange => 'foobarbaz' );
+
+my $foo = $redis->getrange( 'perl_redis_test_getrange', 0, 2 );
+my $bar = $redis->getrange( 'perl_redis_test_getrange', 3, 5 );
+my $baz = $redis->getrange( 'perl_redis_test_getrange', -3, -1 );
+my $all = $redis->getrange( 'perl_redis_test_getrange', 0, -1 );
+
+is $foo, 'foo';
+is $bar, 'bar';
+is $baz, 'baz';
+is $all, 'foobarbaz';
+
+ok $redis->del( 'perl_redis_test_getrange' );
+
+$redis->lpush( perl_redis_test_list => 1 );
+
+eval { $redis->getrange( 'perl_redis_test_list', 1, 2 ) };
+
+like $@, qr/wrong kind of value/;
 
 done_testing;
 

@@ -564,7 +564,19 @@ and value. Returns 1 on success, 0 otherwise.
 
 =str_method setrange
 
-Sets the value of a substring 
+Sets the value of a substring of a string. Takes the key name, the offset, and 
+a replacement string. Returns the length of the modified string. If the key
+is not a string, a fatal error is thrown.
+
+    $client->set( my_key => "I'm a teapot." );
+    my $new_length = $client->setrange( 'my_key', 6, 'foobar' ); # I'm a foobar.
+
+=str_method strlen
+
+Returns the length of a string. Takes the key name. If the key is not a string, 
+a fatal error is thrown.
+
+    my $length = $client->strlength( 'my_key' );
 
 =list_method lindex
 

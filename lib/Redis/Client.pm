@@ -486,6 +486,13 @@ If the key is not a string, a fatal error is thrown.
     my $substr = $client->getrange( 'my_key', 3, 5 );
     my $substr = $client->getrange( 'my_key', -5, -1 );  # last five 
 
+=str_method getset
+
+Sets the value of a string and returns the old value atomically. Takes the
+key name and the new value. If the key is not a string, a fatal error is
+thrown. If the key does not exist, it is created and C<undef> is returned.
+
+    my $old_val = $client->getset( my_key => 'new value' );
 
 =str_method set
 

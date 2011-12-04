@@ -454,6 +454,14 @@ is not a string, a fatal error is thrown.
 
     my $new_val = $client->decr( 'my_num' );
 
+=str_method decrby
+
+Decrements a number stored in a string by a certain amount. Takes the key name and
+the amount by which to decrement. Returns the new value. If the key is not a string,
+a fatal error is thrown.
+
+    my $new_val = $client->decrby( 'my_num', 3 );
+
 =str_method set
 
 Sets the value of a string. Takes the key name and a value. 

@@ -596,6 +596,8 @@ solution and does not use the URP.
 
 =item L<Moose::Object>
 
+=back
+
 =head1 CONSUMES
 
 =over 4

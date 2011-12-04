@@ -527,6 +527,12 @@ be silently converted to one. Therefore, use with caution.
 
     $client->mset( foo => 1, bar => 2, baz => 3 );
 
+=str_method msetnx
+
+Atomically sets the values of multiple strings, only if I<none> of the keys yet exist.
+Returns 1 on success, 0 otherwise. 
+
+    my $it_worked = $client->msetnx( foo => 1, bar => 2, baz => 3 );
 
 =str_method set
 

@@ -456,13 +456,27 @@ a fatal error is thrown.
 
 =list_method blpop
 
-Blocking list pop. Takes a list of keys to poll and a timeout in seconds. Returns
+Blocking left list pop. Takes a list of keys to poll and a timeout in seconds. Returns
 a two-element list containing the name of the list and the popped value on 
 success, C<undef> otherwise. Returns immediately if a value is waiting on any 
 of the specified lists, otherwise waits for a value to appear or the timeout
 to expire. A timeout of zero waits forever. 
 
     my ( $list, $value ) = $client->blpop( 'list1', 'list2', 5 ); # wait 5 secs
+
+See L<lpop> for the non-blocking version.
+
+=list_method brpop
+
+Blocking right list pop. Takes a list of keys to poll and a timeout in seconds. Returns
+a two-element list containing the name of the list and the popped value on 
+success, C<undef> otherwise. Returns immediately if a value is waiting on any
+of the specified lists, otherwise waits for a value to appear or the timeout
+to expire. A timeout of zero waits forever.
+
+    my ( $list, $value ) = $client->brpop( 'list1', 'list2', 5 ); # wait 5 secs
+
+See L<rpop> for the non-blocking version.
 
 =list_method lindex
 

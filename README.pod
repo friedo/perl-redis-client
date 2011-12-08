@@ -6,7 +6,7 @@ Redis::Client - Perl client for Redis 2.4 and up
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -86,11 +86,11 @@ if a connection cannot be obtained.
 
 =over
 
-=item C<host>
+=item * C<host>
 
 The hostname of the Redis server. Defaults to C<localhost>.
 
-=item C<port>
+=item * C<port>
 
 The port number of the Redis server. Defaults to C<6379>.
 
@@ -169,6 +169,16 @@ Returns the value of a string. Takes the key name. If the key is not a string, a
 fatal error is thrown.
 
     my $val = $client->get( 'my_key' );
+
+=head2 getbit
+
+Redis L<GETBIT|http://redis.io/commands/getbit> command.
+
+Returns the value of one bit in a string. Takes the key name and the offset of
+the bit. If the offset is beyond the length of the string, C<0> is returned.
+If the key is not a string, a fatal error is thrown.
+
+    my $bit = $client->getbit( 'my_key', 4 );    # fifth bit from left
 
 =head2 getrange
 
@@ -326,6 +336,19 @@ to expire. A timeout of zero waits forever.
     my ( $list, $value ) = $client->brpop( 'list1', 'list2', 5 ); # wait 5 secs
 
 See L<rpop> for the non-blocking version.
+
+=head2 brpoplpush
+
+Redis L<BRPOPLPUSH|http://redis.io/commands/brpoplpush> command.
+
+Blocking atomic right list pop with left list push. Takes the source to pop, the 
+destination list to push, and a timeout value. Returns the element being popped
+from the source and pushed to the destination, or C<undef> if it times out. A 
+timeout of zero waits forever.
+
+    my $val = $client->brpoplpush( 'source_list', 'dest_list', 5 ); 
+
+See L<rpoplpush> for the non-blocking version.
 
 =head2 lindex
 
@@ -598,14 +621,6 @@ Returns whatever you send it. Useful for testing only. Takes one argument.
     print $client->echo( "Hello, World!" );
 
 =encoding utf8
-
-=str_methdod getbit
-
-Returns the value of one bit in a string. Takes the key name and the offset of
-the bit. If the offset is beyond the length of the string, C<0> is returned.
-If the key is not a string, a fatal error is thrown.
-
-    my $bit = $client->getbit( 'my_key', 4 );    # fifth bit from left
 
 =head1 CAVEATS
 

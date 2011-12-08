@@ -278,11 +278,11 @@ if a connection cannot be obtained.
 
 =over
 
-=item C<host>
+=item * C<host>
 
 The hostname of the Redis server. Defaults to C<localhost>.
 
-=item C<port>
+=item * C<port>
 
 The port number of the Redis server. Defaults to C<6379>.
 
@@ -345,7 +345,7 @@ fatal error is thrown.
 
     my $val = $client->get( 'my_key' );
 
-=str_methdod getbit
+=str_method getbit
 
 Returns the value of one bit in a string. Takes the key name and the offset of
 the bit. If the offset is beyond the length of the string, C<0> is returned.
@@ -477,6 +477,17 @@ to expire. A timeout of zero waits forever.
     my ( $list, $value ) = $client->brpop( 'list1', 'list2', 5 ); # wait 5 secs
 
 See L<rpop> for the non-blocking version.
+
+=list_method brpoplpush
+
+Blocking atomic right list pop with left list push. Takes the source to pop, the 
+destination list to push, and a timeout value. Returns the element being popped
+from the source and pushed to the destination, or C<undef> if it times out. A 
+timeout of zero waits forever.
+
+    my $val = $client->brpoplpush( 'source_list', 'dest_list', 5 ); 
+
+See L<rpoplpush> for the non-blocking version.
 
 =list_method lindex
 

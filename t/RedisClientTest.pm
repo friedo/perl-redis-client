@@ -11,12 +11,21 @@ sub server {
     my $pw   = $ENV{PERL_REDIS_TEST_PASSWORD} || undef;
 
     my $client = eval { 
-        Redis::Client->new( host => $host,
-                            port => $port,
-                            $pw ? ( password => $pw ) : ( ) );
+        my $c = Redis::Client->new( host => $host,
+                                    port => $port,
+                                    $pw ? ( password => $pw ) : ( ) );
+
+        # sockets are lazy, so test connection here
+        my $test = $c->echo( 'foobar' );
+        die 'something strange happened' if $test ne 'foobar';
+        $c;
     };
 
-    return if $@;
+    if ( my $err = $@ ) { 
+        warn $err;
+        return;
+    }
+
     return $client;
 }
 

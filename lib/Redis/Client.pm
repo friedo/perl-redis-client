@@ -15,24 +15,24 @@ has 'pass'         => ( is => 'ro', isa => 'Maybe[Str]', default => undef );
 with 'Redis::Client::Role::URP';
 
 BEGIN { 
-    # maps Redis commands to arity; undef implies variadic
+    # maps Redis commands to arity; arrayref specifies a range
     my %COMMANDS = 
       ( # key commands
-        DEL         => undef,
+        DEL         => [ 1, undef ],
         EXISTS      => 1,
         EXPIRE      => 2,
         EXPITEAT    => 2,
         KEYS        => 1,
         MOVE        => 2,
-        OBJECT      => undef,
+        OBJECT      => [ 1, undef ],
         PERSIST     => 1,
         RANDOMKEY   => 0,
         RENAME      => 2,
         RENAMENX    => 2,
-        SORT        => undef,
+        SORT        => [ 1, undef ],
         TTL         => 1,
         TYPE        => 1,
-        EVAL        => undef,
+        EVAL        => [ 3, undef ],
        
         # string commands
         APPEND      => 2,
@@ -44,9 +44,9 @@ BEGIN {
         GETSET      => 2,
         INCR        => 1,
         INCRBY      => 2,
-        MGET        => undef,
-        MSET        => undef,
-        MSETNX      => undef,
+        MGET        => [ 1, undef ],
+        MSET        => [ 2, undef ],
+        MSETNX      => [ 2, undef ],
         SET         => 2,
         SETBIT      => 3,
         SETEX       => 3,
@@ -55,14 +55,14 @@ BEGIN {
         STRLEN      => 1,
 
         # list commands
-        BLPOP       => undef,
-        BRPOP       => undef,
+        BLPOP       => [ 1, undef ],
+        BRPOP       => [ 1, undef ],
         BRPOPLPUSH  => 3,
         LINDEX      => 2,
         LINSERT     => 4,
         LLEN        => 1,
         LPOP        => 1,
-        LPUSH       => undef,
+        LPUSH       => [ 2, undef ],
         LPUSHX      => 2,
         LRANGE      => 3,
         LREM        => 3,
@@ -70,54 +70,54 @@ BEGIN {
         LTRIM       => 3,
         RPOP        => 1,
         RPOPLPUSH   => 2,
-        RPUSH       => undef,
+        RPUSH       => [ 2, undef ],
         RPUSHX      => 2,
 
         # hash commands
-        HDEL        => undef,
+        HDEL        => [ 2, undef ],
         HEXISTS     => 2,
         HGET        => 2,
         HGETALL     => 1,
         HINCRBY     => 3,
         HKEYS       => 1,
         HLEN        => 1,
-        HMGET       => undef,
-        HMSET       => undef,
+        HMGET       => [ 2, undef ],
+        HMSET       => [ 3, undef ],
         HSET        => 3,
         HSETNX      => 3,
         HVALS       => 1,
 
         # set commands
-        SADD        => undef,
+        SADD        => [ 2, undef ],
         SCARD       => 1,
-        SDIFF       => undef,
-        SDIFFSTORE  => undef,
-        SINTER      => undef,
-        SINTERSTORE => undef,
+        SDIFF       => [ 1, undef ],
+        SDIFFSTORE  => [ 2, undef ],
+        SINTER      => [ 1, undef ],
+        SINTERSTORE => [ 2, undef ],
         SISMEMBER   => 2,
         SMEMBERS    => 1,
         SMOVE       => 3,
         SPOP        => 1,
         SRANDMEMBER => 1,
-        SREM        => undef,
-        SUNION      => undef,
-        SUNIONSTORE => undef,
+        SREM        => [ 2, undef ],
+        SUNION      => [ 1, undef ],
+        SUNIONSTORE => [ 2, undef ],
 
         # zset commands
-        ZADD        => undef,
+        ZADD        => [ 3, undef ],
         ZCARD       => 1,
         ZCOUNT      => 3,
         ZINCRBY     => 3,
-        ZINTERSTORE => undef,
-        ZRANGE      => undef,
-        ZRANGEBYSCORE => undef,
+        ZINTERSTORE => [ 3, undef ],
+        ZRANGE      => [ 3, undef ],
+        ZRANGEBYSCORE => 3,
         ZRANK       => 2,
-        ZREM        => undef,
+        ZREM        => [ 2, undef ],
         ZREMRANGEBYRANK => 3,
-        ZREMRANGEBYSCORE => undef,
+        ZREMRANGEBYSCORE => [ 3, undef ],
         ZREVRANK    => 2,
         ZSCORE      => 2,
-        ZUNIONSTORE => undef,
+        ZUNIONSTORE => [ 3, undef ],
 
         # connection commands
         AUTH        => 1,
@@ -142,7 +142,7 @@ BEGIN {
         SAVE        => 0,
         SHUTDOWN    => 0,
         SLAVEOF     => 2,
-        SLOWLOG     => undef,
+        SLOWLOG     => [ 1, 2 ],
         SYNC        => 0,
       );
 
@@ -152,15 +152,25 @@ BEGIN {
             my @args = @_;
 
             my $args_num = $COMMANDS{$cmd};
-            if ( defined $args_num ) { 
-                croak sprintf( 'Redis %s command requires %s arguments', $cmd, $args_num )
-                  unless @args == $args_num;
-            }
+
+            my $msg = sprintf 'Redis %s command requires %s argument(s)', $cmd, do { 
+                if ( ref $args_num ) { 
+                      ( defined $args_num->[1] ? sprintf( 'between %s and %s', @$args_num ) 
+                                               : sprintf( 'at least %s', $args_num->[0] )
+                      );
+                } else { 
+                    $args_num;
+                }
+            };
+
+            croak $msg if (     ref $args_num ) && ( @args < $args_num->[0] );
+            croak $msg if (     ref $args_num ) && ( defined $args_num->[1] ) && ( @args > $args_num->[1] );
+            croak $msg if ( not ref $args_num ) && ( @args != $args_num );
 
             return $self->send_command( $cmd, @args );
         };
 
-        # some commands have spaces in them. yeesh.
+        # some commands have spaces in their names. yeesh.
         my $meth_name = lc $cmd;
         $meth_name =~ s/\s/_/g;
 

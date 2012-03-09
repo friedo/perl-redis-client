@@ -21,7 +21,7 @@ BEGIN {
         DEL         => [ 1, undef ],
         EXISTS      => 1,
         EXPIRE      => 2,
-        EXPITEAT    => 2,
+        EXPIREAT    => 2,
         KEYS        => 1,
         MOVE        => 2,
         OBJECT      => [ 1, undef ],

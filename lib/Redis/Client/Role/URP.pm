@@ -9,7 +9,7 @@ our @CARP_NOT = ( 'Redis::Client' );     # report errors from the right place
 
 my $CRLF = "\x0D\x0A";
 
-has '_sock'        => ( is => 'ro', isa => 'IO::Socket', init_arg => undef, lazy_build => 1, 
+has '_sock'        => ( is => 'rw', isa => 'IO::Socket', init_arg => undef, lazy_build => 1, 
                         predicate => '_have_sock', clearer => '_clear_sock' );
 
 requires 'host';
@@ -78,6 +78,10 @@ sub _get_response {
         # A Redis error. Get the error message and throw it.
         my $err = $self->$meth;
         $err =~ s/ERR\s/Redis: /;
+
+        # Reconnect to server so next command does not fail
+        $self->_sock( $self->_build__sock );
+
         croak $err;
     }
 

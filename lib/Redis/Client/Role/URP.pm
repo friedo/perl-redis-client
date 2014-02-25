@@ -18,11 +18,18 @@ requires 'port';
 sub _build__sock { 
     my $self = shift;
 
-    my $sock = IO::Socket::INET->new( 
-        PeerAddr    => $self->host,
-        PeerPort    => $self->port,
-        Proto       => 'tcp',
-    ) or die sprintf q{Can't connect to Redis host at %s:%s: %s}, $self->host, $self->port, $@;
+    my $sock = undef;
+    if ( $self->sock ) {
+        $sock = IO::Socket::UNIX->new(
+            Peer       => $self->sock,
+        ) or die sprintf q{Can't connect to Redis host at %s: %s}, $self->sock, $@;
+    } else {
+        $sock = IO::Socket::INET->new( 
+            PeerAddr    => $self->host,
+            PeerPort    => $self->port,
+            Proto       => 'tcp',
+        ) or die sprintf q{Can't connect to Redis host at %s:%s: %s}, $self->host, $self->port, $@;
+    }
 
     return $sock;
 }

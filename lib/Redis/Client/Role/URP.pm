@@ -32,7 +32,9 @@ sub send_command {
     my ( $cmd, @args ) = @_;
 
     my $sock = $self->_sock;
-    my $cmd_block = $self->_build_urp( $cmd, @args );
+    my @cmd = ();
+    ($cmd =~ /\s/) ? (@cmd = split(/\s/, $cmd)) : (@cmd = ($cmd));
+    my $cmd_block = $self->_build_urp( @cmd, @args );
 
     $sock->send( $cmd_block );
 

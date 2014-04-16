@@ -79,6 +79,7 @@ BEGIN {
         HGET        => 2,
         HGETALL     => 1,
         HINCRBY     => 3,
+        HINCRBYFLOAT    => 3,
         HKEYS       => 1,
         HLEN        => 1,
         HMGET       => [ 2, undef ],

@@ -2,12 +2,14 @@ package Redis::Client;
 
 use Moose;
 use IO::Socket::INET ();
+use IO::Socket::UNIX ();
 use Carp 'croak';
 use utf8;
 use namespace::sweep 0.003;
 
 # ABSTRACT: Perl client for Redis 2.4 and up
 
+has 'sock'         => ( is => 'ro', isa => 'Str' );
 has 'host'         => ( is => 'ro', isa => 'Str', default => 'localhost' );
 has 'port'         => ( is => 'ro', isa => 'Int', default => 6379 );
 has 'pass'         => ( is => 'ro', isa => 'Maybe[Str]', default => undef );
@@ -296,6 +298,10 @@ The hostname of the Redis server. Defaults to C<localhost>.
 =item * C<port>
 
 The port number of the Redis server. Defaults to C<6379>.
+
+item * C<sock>
+
+The path to a unix socket of the Redis server.
 
 =back
 
